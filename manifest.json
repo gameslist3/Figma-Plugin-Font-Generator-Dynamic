@@ -1,0 +1,21 @@
+{
+  "name": "Advance Typography Generator",
+  "id": "1636649633102196949",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+
+  "editorType": [
+    "figma",
+    "dev"
+  ],
+
+  "networkAccess": {
+    "allowedDomains": [
+      "https://www.googleapis.com",
+      "https://fonts.googleapis.com",
+      "https://fonts.gstatic.com"
+    ]
+  },
+  "documentAccess": "dynamic-page"
+}
