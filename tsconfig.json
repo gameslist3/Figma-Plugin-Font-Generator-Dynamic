@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
   "compilerOptions": {
     "target": "ES6",
@@ -25,32 +24,3 @@
   },
 
   "include": ["src"]
-=======
-{
-  "compilerOptions": {
-    "target": "ES6",
-
-    "lib": [
-      "ES6",
-      "DOM"
-    ],
-
-    "types": [
-      "@figma/plugin-typings",
-      "vite/client"
-    ],
-
-    "jsx": "react-jsx",
-
-    "module": "ESNext",
-
-    "moduleResolution": "Bundler",
-
-    "strict": true,
-
-    "skipLibCheck": true
-  },
-
-  "include": ["src"]
->>>>>>> 5d0439a63a5f7bf7e8825a903d3bcb9617f3e760
-}
