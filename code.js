@@ -71,7 +71,8 @@ figma.ui.onmessage = async (msg) => {
       fontFamily,
       selectedWeights,
       sizes,
-      device
+      device,
+      createPreview
     } = msg;
 
     const availableFonts = await figma.listAvailableFontsAsync();
@@ -86,6 +87,10 @@ figma.ui.onmessage = async (msg) => {
     }
 
     let created = 0;
+
+    const previewTexts = [];
+
+
 
     for (const weight of selectedWeights) {
       const matchedStyle = matchStyle(weight, familyStyles);
@@ -116,6 +121,82 @@ figma.ui.onmessage = async (msg) => {
         };
 
         created++;
+
+        if (createPreview) {
+          previewTexts.push({
+            weight,
+            size,
+            style: matchedStyle
+          });
+        }
+      }
+    }
+
+    if (createPreview) {
+      const page = figma.createPage();
+      page.name = `${fontFamily} Typography Preview`;
+      figma.currentPage = page;
+
+      const frame = figma.createFrame();
+      frame.name = 'Typography System';
+      frame.resize(1440, Math.max(2200, previewTexts.length * 240));
+      frame.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.97 } }];
+      frame.layoutMode = 'VERTICAL';
+      frame.primaryAxisSizingMode = 'AUTO';
+      frame.counterAxisSizingMode = 'AUTO';
+      frame.paddingTop = 80;
+      frame.paddingBottom = 80;
+      frame.paddingLeft = 80;
+      frame.paddingRight = 80;
+      frame.itemSpacing = 72;
+      page.appendChild(frame);
+
+      const title = figma.createText();
+      await figma.loadFontAsync({ family: fontFamily, style: familyStyles[0] });
+
+      title.characters = 'Headings';
+      title.fontName = { family: fontFamily, style: familyStyles[0] };
+      title.fontSize = 28;
+      title.fills = [{ type: 'SOLID', color: { r: 0.1, g: 0.1, b: 0.1 } }];
+      frame.appendChild(title);
+
+      const sorted = [...previewTexts].sort((a,b)=>b.size-a.size);
+
+      for (let i = 0; i < sorted.length; i++) {
+        const item = sorted[i];
+
+        const section = figma.createFrame();
+        section.layoutMode = 'VERTICAL';
+        section.primaryAxisSizingMode = 'AUTO';
+        section.counterAxisSizingMode = 'AUTO';
+        section.itemSpacing = 20;
+        section.fills = [];
+        frame.appendChild(section);
+
+        const label = figma.createText();
+        await figma.loadFontAsync({ family: fontFamily, style: item.style });
+        label.characters = `H${i+1}`;
+        label.fontName = { family: fontFamily, style: item.style };
+        label.fontSize = 28;
+        label.fills = [{ type: 'SOLID', color: { r: 0.45, g: 0.48, b: 0.52 } }];
+        section.appendChild(label);
+
+        const heading = figma.createText();
+        heading.characters = 'Typography';
+        heading.fontName = { family: fontFamily, style: item.style };
+        heading.fontSize = item.size;
+        heading.lineHeight = { unit: 'PIXELS', value: Math.round(item.size * 1.2) };
+        heading.fills = [{ type: 'SOLID', color: { r: 0.04, g: 0.06, b: 0.08 } }];
+        section.appendChild(heading);
+
+        const meta = figma.createText();
+        const rem = (item.size / 16).toFixed(2).replace('.00','');
+        const lh = Math.round(item.size * 1.2);
+        meta.characters = `Size: ${item.size}px / ${rem}rem        Weight: ${item.style}        Line Height: ${lh}px`;
+        meta.fontName = { family: fontFamily, style: familyStyles[0] };
+        meta.fontSize = 18;
+        meta.fills = [{ type: 'SOLID', color: { r: 0.35, g: 0.37, b: 0.4 } }];
+        section.appendChild(meta);
       }
     }
 
