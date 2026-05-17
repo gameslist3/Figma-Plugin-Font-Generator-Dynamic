@@ -51,6 +51,7 @@ async function createTextNode(
   size:number,
   color="#111111"
 ){
+<<<<<<< HEAD
   await figma.loadFontAsync({family, style: "Regular"}).catch(() => {});
   await figma.loadFontAsync({family,style});
 
@@ -59,6 +60,14 @@ async function createTextNode(
   text.characters = characters;
   text.fontSize = size;
   text.textAutoResize = "WIDTH_AND_HEIGHT";
+=======
+  await figma.loadFontAsync({family,style});
+
+  const text = figma.createText();
+  text.characters = characters;
+  text.fontName = {family,style};
+  text.fontSize = size;
+>>>>>>> 30ab52f79b2d60663d38abd9d99db58b604d3e12
   text.fills = [{
     type:"SOLID",
     color:hex(color)
@@ -107,7 +116,11 @@ figma.ui.onmessage = async (msg) => {
           family: fontFamily,
           style: weight
         });
+<<<<<<< HEAD
       } catch (error) {
+=======
+      } catch {
+>>>>>>> 30ab52f79b2d60663d38abd9d99db58b604d3e12
         continue;
       }
 
@@ -140,13 +153,21 @@ figma.ui.onmessage = async (msg) => {
       const defaultWeight = selectedWeights.length > 0 ? selectedWeights[0] : "Regular";
 
       const root = figma.createFrame();
+<<<<<<< HEAD
       root.name = `${fontFamily} Typography Spec Sheet`;
       root.layoutMode = "VERTICAL";
+=======
+
+      root.name = `${fontFamily} Typography System`;
+
+      root.layoutMode = "HORIZONTAL";
+>>>>>>> 30ab52f79b2d60663d38abd9d99db58b604d3e12
       root.itemSpacing = 48;
       root.paddingTop = 80;
       root.paddingBottom = 80;
       root.paddingLeft = 80;
       root.paddingRight = 80;
+<<<<<<< HEAD
       root.counterAxisSizingMode = "AUTO";
       root.primaryAxisSizingMode = "AUTO";
       root.fills = [{
@@ -287,6 +308,132 @@ figma.ui.onmessage = async (msg) => {
         }
 
         root.appendChild(section);
+=======
+
+      root.counterAxisSizingMode = "AUTO";
+      root.primaryAxisSizingMode = "AUTO";
+
+      root.fills = [{
+        type:"SOLID",
+        color:hex("#F3F4F6")
+      }];
+
+      const categories = [
+        {
+          name:"Headings",
+          items:semanticNames
+        }
+      ];
+
+      for(const category of categories){
+
+        const categoryFrame = figma.createFrame();
+
+        categoryFrame.name = category.name;
+
+        categoryFrame.layoutMode = "VERTICAL";
+        categoryFrame.counterAxisSizingMode = "AUTO";
+        categoryFrame.primaryAxisSizingMode = "AUTO";
+        categoryFrame.itemSpacing = 64;
+
+        categoryFrame.paddingTop = 40;
+        categoryFrame.paddingBottom = 40;
+        categoryFrame.paddingLeft = 40;
+        categoryFrame.paddingRight = 40;
+
+        categoryFrame.cornerRadius = 24;
+
+        categoryFrame.fills = [{
+          type:"SOLID",
+          color:hex("#FFFFFF")
+        }];
+
+        const categoryTitle = await createTextNode(
+          category.name,
+          fontFamily,
+          "Regular",
+          28
+        );
+
+        categoryFrame.appendChild(categoryTitle);
+
+        for(const weight of selectedWeights){
+
+          const weightFrame = figma.createFrame();
+
+          weightFrame.name = weight;
+
+          weightFrame.layoutMode = "VERTICAL";
+          weightFrame.counterAxisSizingMode = "AUTO";
+          weightFrame.primaryAxisSizingMode = "AUTO";
+          weightFrame.itemSpacing = 56;
+
+          weightFrame.fills = [];
+
+          const weightTitle = await createTextNode(
+            weight,
+            fontFamily,
+            "Regular",
+            20,
+            "#6B7280"
+          );
+
+          weightFrame.appendChild(weightTitle);
+
+          for(let i=0;i<scale.length;i++){
+
+            const size = scale[i];
+            const lineHeight = Math.round(size * 1.2);
+
+            const block = figma.createFrame();
+
+            block.layoutMode = "VERTICAL";
+            block.counterAxisSizingMode = "AUTO";
+            block.primaryAxisSizingMode = "AUTO";
+            block.itemSpacing = 18;
+
+            block.fills = [];
+
+            const label = await createTextNode(
+              semanticNames[i] || `H${i+1}`,
+              fontFamily,
+              "Regular",
+              16,
+              "#6B7280"
+            );
+
+            const sample = await createTextNode(
+              semanticNames[i],
+              fontFamily,
+              weight,
+              size
+            );
+
+            sample.lineHeight = {
+              unit:"PIXELS",
+              value:lineHeight
+            };
+
+            const meta = await createTextNode(
+              `Size ${size}px / ${rem(size)}rem      Weight ${weight}      Line Height ${lineHeight}px / ${rem(lineHeight)}rem`,
+              fontFamily,
+              "Regular",
+              14,
+              "#6B7280"
+            );
+
+            block.appendChild(label);
+            block.appendChild(sample);
+            block.appendChild(meta);
+
+            weightFrame.appendChild(block);
+          }
+
+          categoryFrame.appendChild(weightFrame);
+        }
+
+        root.appendChild(categoryFrame);
+>>>>>>> 30ab52f79b2d60663d38abd9d99db58b604d3e12
       }
 
       figma.currentPage.appendChild(root);
