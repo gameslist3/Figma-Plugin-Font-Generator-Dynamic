@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
+<<<<<<< HEAD
 <style>
 :root{
 --bg:#050B17;
@@ -1082,3 +1083,682 @@ parent.postMessage({pluginMessage:{type:'get-fonts'}},'*')
 </script>
 </body>
 </html>
+=======
+
+<style>
+
+:root {
+  --bg: #ffffff;
+  --card: #f7f7f7;
+  --border: #dddddd;
+  --text: #111111;
+  --sub: #777777;
+  --primary: #111111;
+  --primaryText: #ffffff;
+}
+
+.dark {
+  --bg: #111111;
+  --card: #1a1a1a;
+  --border: #2a2a2a;
+  --text: #ffffff;
+  --sub: #999999;
+  --primary: #ffffff;
+  --primaryText: #111111;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, sans-serif;
+  overflow: hidden;
+}
+
+.container {
+  height: 100vh;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.theme-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+}
+
+.device-btn {
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.device-btn.active {
+  background: var(--primary);
+  color: var(--primaryText);
+}
+
+.main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 0;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.input,
+.select {
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0 12px;
+  outline: none;
+}
+
+.font-results {
+  flex: 1;
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.font-item {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.font-item:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.font-name {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.font-variant {
+  font-size: 10px;
+  color: var(--sub);
+  line-height: 1.4;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+}
+
+.weight-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 8px;
+  max-height: 120px;
+  overflow: auto;
+}
+
+.weight-item {
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.preview {
+  flex: 1;
+  overflow: auto;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 12px;
+}
+
+.scale-line {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.generate-btn {
+  height: 52px;
+  border: none;
+  border-radius: 16px;
+  background: var(--primary);
+  color: var(--primaryText);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(120,120,120,0.3);
+  border-radius: 999px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="topbar">
+
+<div class="title">
+Typography Generator
+</div>
+
+<button
+  class="theme-btn"
+  id="themeToggle"
+>
+🌙
+</button>
+
+</div>
+
+<div class="device-grid">
+
+<button class="device-btn active" data-device="Desktop">
+Desktop
+</button>
+
+<button class="device-btn" data-device="Tablet">
+Tablet
+</button>
+
+<button class="device-btn" data-device="Mobile">
+Mobile
+</button>
+
+</div>
+
+<div class="main-grid">
+
+<div class="panel">
+
+<div class="section">
+<div class="label">Search Fonts</div>
+
+<input
+  id="fontSearch"
+  class="input"
+  placeholder="Search Google Fonts"
+/>
+
+</div>
+
+<div
+  id="fontResults"
+  class="font-results"
+></div>
+
+</div>
+
+<div class="panel">
+
+<div class="section">
+<div class="label">Selected Font</div>
+
+<input
+  id="fontFamily"
+  class="input"
+  value="Inter"
+/>
+
+</div>
+
+<div class="controls-grid">
+
+<div class="section">
+<div class="label">Base</div>
+
+<input
+  id="baseSize"
+  class="input"
+  type="number"
+  value="16"
+/>
+
+</div>
+
+<div class="section">
+<div class="label">Ratio</div>
+
+<select id="ratio" class="select">
+<option value="1.2">1.2</option>
+<option value="1.25">1.25</option>
+<option value="1.333" selected>1.333</option>
+<option value="1.618">1.618</option>
+</select>
+
+</div>
+
+<div class="section">
+<div class="label">Variants</div>
+
+<input
+  id="variantCount"
+  class="input"
+  type="number"
+  value="8"
+/>
+
+</div>
+
+</div>
+
+<div class="section">
+<div class="label">Weights</div>
+
+<div
+  id="weightGrid"
+  class="weight-grid"
+></div>
+
+</div>
+
+<div class="section">
+<div class="label">Scale Preview</div>
+
+<div
+  id="scalePreview"
+  class="preview"
+></div>
+
+</div>
+
+</div>
+
+</div>
+
+<button
+  id="generateBtn"
+  class="generate-btn"
+>
+Generate Typography System
+</button>
+
+</div>
+
+<script>
+
+const GOOGLE_FONTS_API =
+  "AIzaSyAbnLX4apHPLu0MGuuzR3x0KSstzuczOHw";
+
+let currentDevice = "Desktop";
+let googleFonts = [];
+
+const deviceButtons =
+  document.querySelectorAll(
+    ".device-btn"
+  );
+
+deviceButtons.forEach(btn => {
+
+  btn.onclick = () => {
+
+    deviceButtons.forEach(b =>
+      b.classList.remove("active")
+    );
+
+    btn.classList.add("active");
+
+    currentDevice =
+      btn.dataset.device;
+  };
+});
+
+function renderScale() {
+
+  const base = Number(
+    document.getElementById(
+      "baseSize"
+    ).value
+  );
+
+  const ratio = Number(
+    document.getElementById(
+      "ratio"
+    ).value
+  );
+
+  const count = Number(
+    document.getElementById(
+      "variantCount"
+    ).value
+  );
+
+  let current = base;
+
+  const items = [];
+
+  for (
+    let i = 0;
+    i < count;
+    i++
+  ) {
+
+    items.unshift(
+      Math.round(current)
+    );
+
+    current = current * ratio;
+  }
+
+  document.getElementById(
+    "scalePreview"
+  ).innerHTML =
+    items.map(size =>
+      `<div class="scale-line">${size}px</div>`
+    ).join("");
+}
+
+renderScale();
+
+function normalizeVariant(v) {
+
+  const map = {
+    "100": "Thin",
+    "200": "Extra Light",
+    "300": "Light",
+    "regular": "Regular",
+    "500": "Medium",
+    "600": "Semi Bold",
+    "700": "Bold",
+    "800": "Extra Bold",
+    "900": "Black",
+
+    "100italic": "Thin Italic",
+    "200italic": "Extra Light Italic",
+    "300italic": "Light Italic",
+    "italic": "Italic",
+    "500italic": "Medium Italic",
+    "600italic": "Semi Bold Italic",
+    "700italic": "Bold Italic",
+    "800italic": "Extra Bold Italic",
+    "900italic": "Black Italic"
+  };
+
+  return map[v] || v;
+}
+
+function renderWeightStyles(
+  variants
+) {
+
+  const weightGrid =
+    document.getElementById(
+      "weightGrid"
+    );
+
+  weightGrid.innerHTML =
+    variants.map(v =>
+      `
+      <label class="weight-item">
+
+        <input
+          type="checkbox"
+          value="${normalizeVariant(v)}"
+          checked
+        />
+
+        ${normalizeVariant(v)}
+
+      </label>
+      `
+    ).join("");
+}
+
+async function fetchGoogleFonts() {
+
+  const response = await fetch(
+    `https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity&key=${GOOGLE_FONTS_API}`
+  );
+
+  const data =
+    await response.json();
+
+  googleFonts = data.items;
+
+  renderFonts(
+    googleFonts.slice(0, 50)
+  );
+}
+
+function renderFonts(fonts) {
+
+  const container =
+    document.getElementById(
+      "fontResults"
+    );
+
+  container.innerHTML =
+    fonts.map(font =>
+      `
+      <div
+        class="font-item"
+        data-font="${font.family}"
+      >
+
+        <div class="font-name">
+          ${font.family}
+        </div>
+
+        <div class="font-variant">
+          ${font.variants.join(", ")}
+        </div>
+
+      </div>
+      `
+    ).join("");
+
+  document
+    .querySelectorAll(
+      ".font-item"
+    )
+    .forEach(item => {
+
+      item.onclick = () => {
+
+        const font =
+          item.dataset.font;
+
+        document.getElementById(
+          "fontFamily"
+        ).value = font;
+
+        const selected =
+          googleFonts.find(
+            item =>
+              item.family === font
+          );
+
+        renderWeightStyles(
+          selected.variants
+        );
+      };
+    });
+}
+
+document.getElementById(
+  "fontSearch"
+).oninput = (e) => {
+
+  const value =
+    e.target.value.toLowerCase();
+
+  const filtered =
+    googleFonts.filter(font =>
+      font.family
+        .toLowerCase()
+        .includes(value)
+    );
+
+  renderFonts(
+    filtered.slice(0, 50)
+  );
+};
+
+document.getElementById(
+  "baseSize"
+).oninput = renderScale;
+
+document.getElementById(
+  "ratio"
+).onchange = renderScale;
+
+document.getElementById(
+  "variantCount"
+).oninput = renderScale;
+
+document.getElementById(
+  "generateBtn"
+).onclick = () => {
+
+  const fontFamily =
+    document.getElementById(
+      "fontFamily"
+    ).value;
+
+  const baseSize = Number(
+    document.getElementById(
+      "baseSize"
+    ).value
+  );
+
+  const ratio = Number(
+    document.getElementById(
+      "ratio"
+    ).value
+  );
+
+  const variantCount = Number(
+    document.getElementById(
+      "variantCount"
+    ).value
+  );
+
+  const selectedWeights =
+    [...document.querySelectorAll(
+      'input[type="checkbox"]:checked'
+    )].map(
+      item => item.value
+    );
+
+  parent.postMessage(
+    {
+      pluginMessage: {
+        type: "generate-system",
+        fontFamily,
+        baseSize,
+        ratio,
+        variantCount,
+        selectedWeights,
+        device: currentDevice
+      }
+    },
+    "*"
+  );
+};
+
+const themeToggle =
+  document.getElementById(
+    "themeToggle"
+  );
+
+let darkMode = true;
+
+themeToggle.onclick = () => {
+
+  darkMode = !darkMode;
+
+  document.body.classList.toggle(
+    "dark"
+  );
+
+  themeToggle.innerHTML =
+    darkMode
+      ? "☀️"
+      : "🌙";
+};
+
+document.body.classList.add(
+  "dark"
+);
+
+fetchGoogleFonts();
+
+</script>
+
+</body>
+</html>
+
+>>>>>>> 5d0439a63a5f7bf7e8825a903d3bcb9617f3e760
