@@ -40,14 +40,64 @@ body::-webkit-scrollbar{display:none}
 .ratio.active{background:var(--primary)}
 .ratio strong{display:block;font-size:18px}
 .ratio span{font-size:12px;color:var(--muted)}
-.bottom{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;overflow:hidden;min-height:0;align-items:start;flex:1}
+.bottom{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;overflow:visible;min-height:auto;align-items:start;flex:1}
 .weights,.preview{border:1px solid var(--border);border-radius:16px;padding:12px;background:var(--panel);min-height:0}
-.weights{overflow-y:auto;max-height:100%}
+.weights{overflow-y:visible;max-height:none;height:auto}
 .preview{overflow-y:auto;max-height:100%;padding-right:8px;scrollbar-width:thin}
 .preview::-webkit-scrollbar{width:6px}
 .preview::-webkit-scrollbar-thumb{background:#31456f;border-radius:20px}
-.weight{display:flex;justify-content:space-between;align-items:center;height:46px;padding:0 12px;border-radius:12px;cursor:pointer;margin-bottom:8px;background:#111a2c}
-.weight.active{background:var(--primary)}
+.weight{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  height:40px;
+  padding:0 14px;
+  border-radius:10px;
+  cursor:pointer;
+  margin-bottom:6px;
+  background:rgba(255,255,255,0.03);
+  border:1.5px solid rgba(255,255,255,0.05);
+  transition:all 0.2s ease;
+}
+.weight:hover{
+  background:rgba(255,255,255,0.06);
+  border-color:rgba(255,255,255,0.12);
+}
+.weight.active{
+  background:rgba(59,130,246,0.1) !important;
+  border-color:rgba(59,130,246,0.5) !important;
+  color:#60a5fa !important;
+}
+.weight input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  outline: none;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+.weight input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+.weight input[type="checkbox"]:checked::after {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 6px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
 .preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
 .preview-card{padding:14px;border-radius:14px;background:#111a2c;border:1px solid var(--border)}
 .preview-card small{display:block;color:var(--muted);margin-bottom:8px}
@@ -198,17 +248,18 @@ min-height:74px;
 display:grid !important;
 grid-template-columns:220px minmax(0,1fr) !important;
 gap:20px !important;
-overflow:hidden !important;
-min-height:100% !important;
-height:100%;
+overflow:visible !important;
+min-height:auto !important;
+height:auto !important;
 }
 
 .weights{
 display:flex !important;
 flex-direction:column !important;
 gap:12px !important;
-overflow-y:auto !important;
-min-height:0 !important;
+overflow-y:visible !important;
+max-height:none !important;
+min-height:auto !important;
 padding-right:4px;
 }
 
@@ -257,7 +308,7 @@ grid-template-columns:1fr !important;
 grid-template-columns:1fr !important;
 }
 .weights{
-max-height:220px;
+max-height:none !important;
 }
 }
 
@@ -953,9 +1004,13 @@ border-radius:20px;
 <div class="ratios">
 <div class="ratio active" data-ratio="1.2"><strong>1.2</strong><span>Minor Third</span></div>
 <div class="ratio" data-ratio="1.25"><strong>1.25</strong><span>Major Third</span></div>
-<div class="ratio" data-ratio="1.333"><strong>1.333</strong><span>Perfect Fourth</span></div>
 <div class="ratio" data-ratio="1.414"><strong>1.414</strong><span>Augmented</span></div>
 <div class="ratio" data-ratio="1.618"><strong>1.618</strong><span>Golden Ratio</span></div>
+<div class="ratio" id="customRatioCard">
+  <input type="number" id="customRatioInput" placeholder="ex: 1.5" step="0.01" style="display:none; width:100%; background:transparent; border:none; color:white; font-size:16px; font-weight:bold; outline:none; padding:0; margin-bottom:2px;" />
+  <strong id="customRatioLabel" style="font-size:16px;">Custom</strong>
+  <span>Ratio</span>
+</div>
 </div></div>
 <div class="bottom">
 <div>
@@ -1016,6 +1071,7 @@ function renderFonts(list){
  const root=document.getElementById('fontList');
  root.innerHTML='';
  list.forEach((font,index)=>{
+ const card=document.createElement('div');
  card.className='font-card'+(index===0?' active':'');
  card.dataset.fontFamily = font.family;
  const variants = [...new Set(font.styles)].join(' • ');
@@ -1066,32 +1122,56 @@ function adjust(id,val){
 }
 
 document.querySelectorAll('.device').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.device').forEach(el=>el.classList.remove('active'));btn.classList.add('active');currentDevice=btn.innerText});
-document.querySelectorAll('.ratio').forEach(card=>card.onclick=()=>{
- document.querySelectorAll('.ratio').forEach(el=>el.classList.remove('active'));
- card.classList.add('active');
- if(card.id==='customRatio'){
- const value=prompt('Enter custom ratio', currentRatio)||currentRatio;
- const parsed=parseFloat(value);
- if(!isNaN(parsed)&&parsed>1){
- currentRatio=parsed;
- card.querySelector('strong').innerText=parsed;
- }
- } else {
- currentRatio=Number(card.dataset.ratio);
- }
- renderPreview()
+document.querySelectorAll('.ratio').forEach(card=>card.onclick=(e)=>{
+  if (e.target.id === 'customRatioInput') return; // let input receive clicks
+  document.querySelectorAll('.ratio').forEach(el=>el.classList.remove('active'));
+  card.classList.add('active');
+  
+  const customLabel = document.getElementById('customRatioLabel');
+  const customInput = document.getElementById('customRatioInput');
+  
+  if(card.id==='customRatioCard'){
+    customLabel.style.display = 'none';
+    customInput.style.display = 'block';
+    customInput.focus();
+    const val = parseFloat(customInput.value);
+    if(!isNaN(val) && val > 1) {
+      currentRatio = val;
+    }
+  } else {
+    customLabel.style.display = 'block';
+    customInput.style.display = 'none';
+    currentRatio=Number(card.dataset.ratio);
+  }
+  renderPreview()
 });
+
+document.getElementById('customRatioInput').oninput=(e)=>{
+  const val = parseFloat(e.target.value);
+  if(!isNaN(val) && val > 1) {
+    currentRatio = val;
+    renderPreview();
+  }
+};
 document.getElementById('search').oninput=(e)=>{const value=e.target.value.toLowerCase();renderFonts(allFonts.filter(font=>font.family.toLowerCase().includes(value)))};
 document.getElementById('baseSize').oninput=renderPreview;
 document.getElementById('variants').oninput=renderPreview;
 
 document.getElementById('generate').onclick=()=>{
- const base=Number(document.getElementById('baseSize').value)||16;
- const count=Number(document.getElementById('variants').value)||8;
- const sizes=[]; let current=base;
- for(let i=0;i<count;i++){sizes.unshift(Math.round(current));current*=currentRatio}
- const selectedWeights=[...document.querySelectorAll('.weight.active')].map(el=>el.dataset.style);
- parent.postMessage({pluginMessage:{type:'generate-system',fontFamily:currentFont,selectedWeights,sizes,device:currentDevice}},'*')
+  const baseSize=Number(document.getElementById('baseSize').value)||16;
+  const variantCount=Number(document.getElementById('variants').value)||8;
+  const createDesign=document.querySelector('.toggle input[type="checkbox"]').checked;
+  const selectedWeights=[...document.querySelectorAll('.weight.active')].map(el=>el.dataset.style);
+  parent.postMessage({pluginMessage:{
+    type:'generate-system',
+    fontFamily:currentFont,
+    selectedWeights,
+    baseSize,
+    variantCount,
+    ratio:currentRatio,
+    device:currentDevice,
+    createDesign
+  }},'*')
 }
 
 window.onmessage=(event)=>{
