@@ -964,6 +964,85 @@ height:5px;
 background:#31456F;
 border-radius:20px;
 }
+
+.mapping-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+.mapping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mapping-row {
+  display: grid;
+  grid-template-columns: 1fr 130px 36px;
+  gap: 10px;
+  align-items: center;
+}
+.mapping-input {
+  height: 38px !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--border) !important;
+  background: #0E1729 !important;
+  color: white !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+  outline: none !important;
+  width: 100%;
+}
+.mapping-input:focus {
+  border-color: var(--accent2) !important;
+}
+.mapping-input[type="number"] {
+  text-align: center;
+}
+.btn-secondary {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+}
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  color: #ef4444 !important;
+  height: 36px !important;
+  width: 36px !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  padding: 0 !important;
+}
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+.btn-add {
+  align-self: flex-start;
+  margin-top: 2px;
+}
 </style>
 
 </head>
@@ -1012,6 +1091,18 @@ border-radius:20px;
   <span>Ratio</span>
 </div>
 </div></div>
+
+<div class="field" style="margin-top: 8px;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="label">Typography Range Mapping</div>
+    <button class="btn-secondary" onclick="resetMappingToDefaults()">Reset to Defaults</button>
+  </div>
+  <div class="mapping-section">
+    <div class="mapping-list" id="mappingList"></div>
+    <button class="btn-secondary btn-add" onclick="addMappingRow()">+ Add Category</button>
+  </div>
+</div>
+
 <div class="bottom">
 <div>
 <div class="label" style="margin-bottom:8px">Weights</div>
@@ -1034,12 +1125,219 @@ let currentFont = '';
 let currentDevice = 'Desktop';
 let currentRatio = 1.2;
 let allFonts = [];
+let rangeMappings = [];
+let userCustomized = false;
 
 const weightLabels = {
 Thin:'Thin',ExtraLight:'Extra Light',Light:'Light',Regular:'Regular',Medium:'Medium',SemiBold:'Semi Bold',Bold:'Bold',ExtraBold:'Extra Bold',Black:'Black'
 };
 
 function normalize(v){return v.toLowerCase().replace(/[^a-z0-9]/g,'')}
+
+function getSmartDefaultMappings(scale) {
+  if (!scale || scale.length === 0) {
+    return [
+      { prefix: 'Hero', minSize: 38 },
+      { prefix: 'H', minSize: 17 },
+      { prefix: 'P', minSize: 12 },
+      { prefix: 'Caption', minSize: 10 },
+      { prefix: 'Label', minSize: 8 }
+    ];
+  }
+  const max = scale[0] || 16;
+  let heroThreshold = 38;
+  let headingThreshold = 17;
+  let paragraphThreshold = 12;
+  let captionThreshold = 10;
+  let labelThreshold = 8;
+  
+  if (max < 24) {
+    heroThreshold = 999;
+    headingThreshold = 15;
+    paragraphThreshold = 12;
+    captionThreshold = 10;
+    labelThreshold = 8;
+  } else if (max < 32) {
+    heroThreshold = 28;
+    headingThreshold = 16;
+    paragraphThreshold = 12;
+    captionThreshold = 10;
+    labelThreshold = 8;
+  }
+  
+  const assigned = scale.map(size => {
+    if (size >= heroThreshold) return { size, prefix: 'Hero' };
+    if (size >= headingThreshold) return { size, prefix: 'H' };
+    if (size >= paragraphThreshold) return { size, prefix: 'P' };
+    if (size >= captionThreshold) return { size, prefix: 'Caption' };
+    return { size, prefix: 'Label' };
+  });
+
+  const uniqueMappings = [];
+  const prefixes = [...new Set(assigned.map(x => x.prefix))];
+  
+  prefixes.forEach(prefix => {
+    const sizesWithPrefix = assigned.filter(x => x.prefix === prefix).map(x => x.size);
+    const minSizeForPrefix = Math.min(...sizesWithPrefix);
+    uniqueMappings.push({ prefix, minSize: minSizeForPrefix });
+  });
+
+  return uniqueMappings;
+}
+
+function resetMappingToDefaults() {
+  userCustomized = false;
+  const base = Number(document.getElementById('baseSize').value) || 16;
+  const count = Number(document.getElementById('variants').value) || 8;
+  const arr = []; let current = base;
+  for (let i = 0; i < count; i++) { arr.unshift(Math.round(current)); current *= currentRatio; }
+  rangeMappings = getSmartDefaultMappings(arr);
+  renderMappings();
+  renderPreview();
+}
+
+function addMappingRow() {
+  userCustomized = true;
+  
+  // Calculate a reasonable minSize for the new custom row based on scale
+  const base = Number(document.getElementById('baseSize').value) || 16;
+  const count = Number(document.getElementById('variants').value) || 8;
+  const arr = []; let current = base;
+  for (let i = 0; i < count; i++) { arr.unshift(Math.round(current)); current *= currentRatio; }
+  
+  const lowestExisting = rangeMappings.length > 0 ? Math.min(...rangeMappings.map(m => m.minSize)) : 0;
+  const candidateSizes = arr.filter(s => s < lowestExisting);
+  const newMin = candidateSizes.length > 0 ? candidateSizes[candidateSizes.length - 1] : (lowestExisting > 0 ? lowestExisting - 1 : 12);
+  
+  rangeMappings.push({ prefix: 'Custom', minSize: newMin });
+  renderMappings();
+  renderPreview();
+}
+
+function removeMappingRow(index) {
+  userCustomized = true;
+  rangeMappings.splice(index, 1);
+  renderMappings();
+  renderPreview();
+}
+
+function updateMappingField(index, field, value) {
+  userCustomized = true;
+  if (field === 'minSize') {
+    rangeMappings[index][field] = Number(value) || 0;
+  } else {
+    rangeMappings[index][field] = value;
+  }
+  renderMappings();
+  renderPreview();
+}
+
+function getSemanticName(prefix, indexInGroup, totalInGroup) {
+  const cleanPrefix = prefix.trim();
+  const isSingleLetter = /^[hHpP]$/.test(cleanPrefix);
+
+  if (isSingleLetter) {
+    return `${cleanPrefix.toUpperCase()}${indexInGroup + 1}`;
+  }
+
+  if (totalInGroup === 1) {
+    return cleanPrefix;
+  }
+
+  if (indexInGroup === 0) {
+    return cleanPrefix;
+  }
+
+  return `${cleanPrefix} ${indexInGroup + 1}`;
+}
+
+function getCategoryForSize(size, mappings) {
+  const sorted = [...mappings].sort((a, b) => b.minSize - a.minSize);
+  for (const m of sorted) {
+    if (size >= m.minSize) {
+      return m;
+    }
+  }
+  return sorted[sorted.length - 1] || { prefix: 'Label', minSize: size };
+}
+
+function computeSemanticNames(scale, mappings) {
+  const mapped = scale.map((size) => {
+    const cat = getCategoryForSize(size, mappings);
+    return {
+      size,
+      prefix: cat.prefix
+    };
+  });
+
+  const prefixCounts = {};
+  mapped.forEach((item) => {
+    prefixCounts[item.prefix] = (prefixCounts[item.prefix] || 0) + 1;
+  });
+
+  const prefixIndices = {};
+  const semanticNames = scale.map((size) => {
+    const cat = getCategoryForSize(size, mappings);
+    const prefix = cat.prefix;
+    const total = prefixCounts[prefix];
+    const index = prefixIndices[prefix] || 0;
+    prefixIndices[prefix] = index + 1;
+
+    return getSemanticName(prefix, index, total);
+  });
+
+  return semanticNames;
+}
+
+function renderMappings() {
+  const container = document.getElementById('mappingList');
+  container.innerHTML = '';
+  
+  const base = Number(document.getElementById('baseSize').value) || 16;
+  const count = Number(document.getElementById('variants').value) || 8;
+  const scale = []; let current = base;
+  for (let i = 0; i < count; i++) { scale.unshift(Math.round(current)); current *= currentRatio; }
+  
+  const absMax = scale.length > 0 ? scale[0] : 999;
+  const absMin = scale.length > 0 ? scale[scale.length - 1] : 0;
+  
+  rangeMappings.sort((a, b) => b.minSize - a.minSize);
+  
+  rangeMappings.forEach((mapping, index) => {
+    const row = document.createElement('div');
+    row.className = 'mapping-row';
+    
+    // Find the exact maximum size from the scale that falls into this category
+    let actualMax = absMax;
+    if (index > 0) {
+      const prevMin = rangeMappings[index - 1].minSize;
+      const validSizes = scale.filter(s => s < prevMin);
+      actualMax = validSizes.length > 0 ? Math.max(...validSizes) : mapping.minSize;
+    }
+    
+    // Find the exact minimum size from the scale that falls into this category
+    let nextMin = index < rangeMappings.length - 1 ? rangeMappings[index + 1].minSize : absMin;
+    const sizesInCat = scale.filter(s => s >= mapping.minSize && (index === 0 || s <= actualMax));
+    
+    // Lock the first row's max size
+    const isFirst = index === 0;
+    // Lock the last row's min size indicator (we still let them edit the boundary input to shrink/grow, but it shouldn't go below absMin)
+    const isLast = index === rangeMappings.length - 1;
+    
+    const displayMax = actualMax;
+    
+    row.innerHTML = `
+      <input type="text" class="mapping-input" value="${mapping.prefix}" oninput="updateMappingField(${index}, 'prefix', this.value)" placeholder="Category Prefix" />
+      <div style="display:flex; align-items:center; gap: 4px; background: #0E1729; border: 1px solid var(--border); border-radius: 10px; padding: 0 8px; height: 38px; width: 100%; box-sizing: border-box;">
+        <span style="color: #6B7280; font-size: 13px; flex: 1; text-align: right; user-select: none;">${displayMax}px</span>
+        <span style="color: #4B5563; padding: 0 4px;">-</span>
+        <input type="number" class="mapping-input" style="height: 100% !important; border: none !important; background: transparent !important; padding: 0 !important; width: 40px; text-align: left;" value="${mapping.minSize}" onchange="updateMappingField(${index}, 'minSize', this.value)" />
+      </div>
+      <button class="btn-danger" onclick="removeMappingRow(${index})" ${rangeMappings.length <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>×</button>
+    `;
+    container.appendChild(row);
+  });
+}
 
 
 const loadedFonts = new Set();
@@ -1095,7 +1393,7 @@ function renderWeights(styles){
  const label=weightLabels[style.replace(/\s/g,'')]||style;
  const item=document.createElement('div');
  item.className='weight active';
- item.dataset.style=label;
+ item.dataset.style=style; // Send exact Figma style string!
  item.innerHTML=`<span>${label}</span><input checked type="checkbox">`;
  item.onclick=()=>{item.classList.toggle('active');item.querySelector('input').checked=item.classList.contains('active')}
  root.appendChild(item);
@@ -1107,11 +1405,20 @@ function renderPreview(){
  const count=Number(document.getElementById('variants').value)||8;
  const arr=[]; let current=base;
  for(let i=0;i<count;i++){arr.unshift(Math.round(current));current*=currentRatio}
+ 
+ if (!userCustomized) {
+   rangeMappings = getSmartDefaultMappings(arr);
+   renderMappings();
+ }
+ 
+ const semanticNames = computeSemanticNames(arr, rangeMappings);
+ 
  const root=document.getElementById('preview');
  root.innerHTML='';
  arr.forEach((size,index)=>{
  loadGoogleFont(currentFont);
- root.innerHTML += `<div class="preview-card"><small>Size ${index+1}</small><div style="font-size:${Math.min(size,48)}px;font-family:'${currentFont}',sans-serif">Aa</div><div style="margin-top:10px;font-weight:700">${size}px</div></div>`
+ const semName = semanticNames[index] || `Size ${index+1}`;
+ root.innerHTML += `<div class="preview-card"><small>${semName}</small><div style="font-size:${Math.min(size,48)}px;font-family:'${currentFont}',sans-serif">Aa</div><div style="margin-top:10px;font-weight:700">${size}px</div></div>`
  })
 }
 
@@ -1170,7 +1477,8 @@ document.getElementById('generate').onclick=()=>{
     variantCount,
     ratio:currentRatio,
     device:currentDevice,
-    createDesign
+    createDesign,
+    rangeMappings
   }},'*')
 }
 
