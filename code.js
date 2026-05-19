@@ -1,5 +1,26 @@
 "use strict";
 (() => {
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
+
   // src/code.ts
   figma.showUI(__html__, {
     width: 1020,
@@ -18,9 +39,11 @@
     }
     return scale;
   }
-  async function getAvailableStyles(family) {
-    const fonts = await figma.listAvailableFontsAsync();
-    return fonts.filter((font) => font.fontName.family === family).map((font) => font.fontName.style);
+  function getAvailableStyles(family) {
+    return __async(this, null, function* () {
+      const fonts = yield figma.listAvailableFontsAsync();
+      return fonts.filter((font) => font.fontName.family === family).map((font) => font.fontName.style);
+    });
   }
   function hex(hexColor) {
     const hex2 = hexColor.replace("#", "");
@@ -34,41 +57,47 @@
   function rem(px) {
     return (px / 16).toFixed(2).replace(".00", "");
   }
-  async function createTextNode(characters, family, style, size, color = "#111111") {
-    try {
-      await figma.loadFontAsync({ family, style });
-    } catch (e) {
+  function createTextNode(characters, family, style, size, color = "#111111") {
+    return __async(this, null, function* () {
       try {
-        await figma.loadFontAsync({ family, style: "Regular" });
-        style = "Regular";
-      } catch (e2) {
-        await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-        family = "Inter";
-        style = "Regular";
+        yield figma.loadFontAsync({ family, style });
+      } catch (e) {
+        try {
+          yield figma.loadFontAsync({ family, style: "Regular" });
+          style = "Regular";
+        } catch (e2) {
+          yield figma.loadFontAsync({ family: "Inter", style: "Regular" });
+          family = "Inter";
+          style = "Regular";
+        }
       }
-    }
-    const text = figma.createText();
-    try {
-      text.fontName = { family, style };
-    } catch (err) {
+      const text = figma.createText();
       try {
-        text.fontName = { family: "Inter", style: "Regular" };
-      } catch (err2) {
+        text.fontName = { family, style };
+      } catch (err) {
+        try {
+          text.fontName = { family: "Inter", style: "Regular" };
+        } catch (err2) {
+        }
       }
-    }
-    text.characters = characters;
-    text.fontSize = size;
-    text.textAutoResize = "WIDTH_AND_HEIGHT";
-    text.fills = [{
-      type: "SOLID",
-      color: hex(color)
-    }];
-    return text;
+      text.characters = characters;
+      text.fontSize = size;
+      text.textAutoResize = "WIDTH_AND_HEIGHT";
+      text.fills = [{
+        type: "SOLID",
+        color: hex(color)
+      }];
+      return text;
+    });
   }
-  figma.ui.onmessage = async (msg) => {
+  figma.ui.onmessage = (msg) => __async(null, null, function* () {
+    if (msg.type === "resize") {
+      figma.ui.resize(msg.width, msg.height);
+      return;
+    }
     if (msg.type === "get-fonts") {
       try {
-        const fonts = await figma.listAvailableFontsAsync();
+        const fonts = yield figma.listAvailableFontsAsync();
         const grouped = {};
         fonts.forEach((font) => {
           const family = font.fontName.family;
@@ -92,7 +121,7 @@
       return;
     }
     if (msg.type === "get-font-styles") {
-      const styles = await getAvailableStyles(msg.family);
+      const styles = yield getAvailableStyles(msg.family);
       figma.ui.postMessage({
         type: "font-styles",
         styles
@@ -195,7 +224,7 @@
       let createdCount = 0;
       for (const weight of selectedWeights) {
         try {
-          await figma.loadFontAsync({
+          yield figma.loadFontAsync({
             family: fontFamily,
             style: weight
           });
@@ -239,14 +268,14 @@
         titleBlock.counterAxisSizingMode = "AUTO";
         titleBlock.primaryAxisSizingMode = "AUTO";
         titleBlock.fills = [];
-        const mainTitle = await createTextNode(
+        const mainTitle = yield createTextNode(
           `${fontFamily} Typography System \u2014 ${device}`,
           fontFamily,
           defaultWeight,
           32,
           "#111827"
         );
-        const subtitle = await createTextNode(
+        const subtitle = yield createTextNode(
           `Automated design system guidelines for the ${fontFamily} family on ${device}.`,
           "Inter",
           "Regular",
@@ -294,14 +323,14 @@
           sectionHeader.counterAxisSizingMode = "AUTO";
           sectionHeader.primaryAxisSizingMode = "AUTO";
           sectionHeader.fills = [];
-          const sectionTitle = await createTextNode(
+          const sectionTitle = yield createTextNode(
             `${prefix} Typography`,
             fontFamily,
             defaultWeight,
             22,
             "#111827"
           );
-          const sectionSubtitle = await createTextNode(
+          const sectionSubtitle = yield createTextNode(
             `Generated sizes for the ${prefix} category.`,
             "Inter",
             "Regular",
@@ -337,7 +366,7 @@
             tag.fills = [{ type: "SOLID", color: hex("#111827") }];
             tag.counterAxisSizingMode = "AUTO";
             tag.primaryAxisSizingMode = "AUTO";
-            const tagText = await createTextNode(
+            const tagText = yield createTextNode(
               `${levelName} \xB7 ${size}px`,
               fontFamily,
               defaultWeight,
@@ -349,7 +378,7 @@
             sizeBlock.appendChild(tagContainer);
             for (const weight of selectedWeights) {
               try {
-                await figma.loadFontAsync({ family: fontFamily, style: weight });
+                yield figma.loadFontAsync({ family: fontFamily, style: weight });
               } catch (error) {
                 continue;
               }
@@ -360,14 +389,14 @@
               previewBlock.counterAxisSizingMode = "AUTO";
               previewBlock.primaryAxisSizingMode = "AUTO";
               previewBlock.fills = [];
-              const weightLabel = await createTextNode(
+              const weightLabel = yield createTextNode(
                 weight.toUpperCase(),
                 "Inter",
                 "Bold",
                 11,
                 "#9CA3AF"
               );
-              const sample = await createTextNode(
+              const sample = yield createTextNode(
                 "Typography",
                 fontFamily,
                 weight,
@@ -384,7 +413,7 @@
               } else {
                 sample.lineHeight = { unit: "PIXELS", value: lineHeight };
               }
-              const metaText = await createTextNode(
+              const metaText = yield createTextNode(
                 `${size}px / ${rem(size)}rem    Line Height ${lineHeight}px    ${fontFamily} ${weight}`,
                 "Inter",
                 "Regular",
@@ -409,5 +438,5 @@
       console.error(error);
       figma.notify("Typography generation failed.");
     }
-  };
+  });
 })();

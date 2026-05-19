@@ -87,6 +87,11 @@ async function createTextNode(
 
 figma.ui.onmessage = async (msg) => {
 
+  if (msg.type === "resize") {
+    figma.ui.resize(msg.width, msg.height);
+    return;
+  }
+
   if (msg.type === "get-fonts") {
     try {
       const fonts = await figma.listAvailableFontsAsync();

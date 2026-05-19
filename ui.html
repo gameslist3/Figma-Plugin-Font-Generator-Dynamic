@@ -1,1497 +1,1275 @@
-<style>
-:root{
---bg:#050B17;
---panel:#0E1524;
---panel2:#141C2D;
---border:#222D42;
---primary:#243554;
---primary-hover:#2f4670;
---text:#fff;
---muted:#8791A5;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,sans-serif,}
-body{background:var(--bg);color:var(--text);padding:16px;height:100vh;overflow:hidden}
-body::-webkit-scrollbar{display:none}
-.app{height:100%;display:flex;flex-direction:column;gap:18px;overflow:hidden}
-.header{display:flex;justify-content:space-between;align-items:center;gap:18px}
-.brand{font-size:20px;font-weight:700}
-.device-group{display:flex;gap:12px}
-.device{height:50px;padding:0 28px;border-radius:14px;background:var(--panel);border:1px solid var(--border);color:var(--text);cursor:pointer}
-.device.active{background:var(--primary)}
-.layout{display:grid;grid-template-columns:280px 1fr;gap:18px;flex:1;overflow:hidden}
-.sidebar,.main{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:18px;padding:16px}
-.sidebar{overflow:hidden;display:flex;flex-direction:column;gap:12px}
-.search{height:52px;border-radius:14px;background:var(--panel);border:1px solid var(--border);padding:0 16px;color:var(--text)}
-.font-list{overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:6px;min-height:0;flex:1;scrollbar-width:thin;scrollbar-color:transparent transparent}.font-list::-webkit-scrollbar{width:6px}.font-list::-webkit-scrollbar-track{background:transparent}.font-list::-webkit-scrollbar-thumb{background:transparent;border-radius:20px}.font-list:hover::-webkit-scrollbar-thumb{background:#31456f}.font-list:hover{scrollbar-color:#31456f transparent}
-.font-card{padding:14px;border-radius:14px;background:var(--panel);border:1px solid transparent;cursor:pointer;overflow:hidden}
-.font-card.active{border-color:#4f6ea3;background:var(--panel2)}
-.font-name{font-size:18px;font-weight:600;margin-bottom:6px;color:#fff;line-height:1.3;overflow:visible;text-rendering:optimizeLegibility}
-.font-meta{font-size:12px;color:var(--muted);line-height:1.5}
-.main{display:flex;flex-direction:column;gap:18px;overflow:hidden;min-width:0}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
-.field{display:flex;flex-direction:column;gap:8px;min-width:0}
-.label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase}
-.input-wrap{display:grid;grid-template-columns:54px minmax(0,1fr) 54px;gap:10px;width:100%}
-.input,.step{height:56px;border-radius:14px;border:1px solid var(--border);background:var(--panel);color:var(--text)}
-.input{text-align:center;font-size:24px;font-weight:700;width:100%;min-width:0}
-.step{font-size:26px;cursor:pointer}
-.ratios{display:grid;grid-template-columns:1fr;gap:12px;overflow-y:auto;overflow-x:hidden;padding-right:6px;max-height:320px;scrollbar-width:thin}.ratios::-webkit-scrollbar{width:6px}.ratios::-webkit-scrollbar-thumb{background:#31456f;border-radius:20px}
-.ratio{min-height:84px;border-radius:16px;border:1px solid var(--border);background:var(--panel);padding:12px;cursor:pointer;overflow:hidden}
-.ratio.active{background:var(--primary)}
-.ratio strong{display:block;font-size:18px}
-.ratio span{font-size:12px;color:var(--muted)}
-.bottom{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;overflow:visible;min-height:auto;align-items:start;flex:1}
-.weights,.preview{border:1px solid var(--border);border-radius:16px;padding:12px;background:var(--panel);min-height:0}
-.weights{overflow-y:visible;max-height:none;height:auto}
-.preview{overflow-y:auto;max-height:100%;padding-right:8px;scrollbar-width:thin}
-.preview::-webkit-scrollbar{width:6px}
-.preview::-webkit-scrollbar-thumb{background:#31456f;border-radius:20px}
-.weight{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  height:40px;
-  padding:0 14px;
-  border-radius:10px;
-  cursor:pointer;
-  margin-bottom:6px;
-  background:rgba(255,255,255,0.03);
-  border:1.5px solid rgba(255,255,255,0.05);
-  transition:all 0.2s ease;
-}
-.weight:hover{
-  background:rgba(255,255,255,0.06);
-  border-color:rgba(255,255,255,0.12);
-}
-.weight.active{
-  background:rgba(59,130,246,0.1) !important;
-  border-color:rgba(59,130,246,0.5) !important;
-  color:#60a5fa !important;
-}
-.weight input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  border-radius: 4px;
-  outline: none;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  position: relative;
-}
-.weight input[type="checkbox"]:checked {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
-}
-.weight input[type="checkbox"]:checked::after {
-  content: '';
-  display: block;
-  width: 3px;
-  height: 6px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-  margin-bottom: 2px;
-}
-.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
-.preview-card{padding:14px;border-radius:14px;background:#111a2c;border:1px solid var(--border)}
-.preview-card small{display:block;color:var(--muted);margin-bottom:8px}
-.footer{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-top:6px;flex-wrap:wrap;position:sticky;bottom:0;background:#07101D,rgba(5,11,23,0.8);padding-bottom:0px;margin-top:auto;z-index:5}
-.toggle{display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:600}
-.generate{width:min(420px,100%);min-width:260px;height:58px;border:none;border-radius:16px;background:rgba(10,16,27,0.8) 90% !important;
-backdrop-filter:blur(5px);;font-size:18px;font-weight:700;cursor:pointer;flex-shrink:0}
-.generate:hover{background:var(--primary-hover)}
-@media (max-width: 1100px){
-.layout{grid-template-columns:240px minmax(0,1fr)}
-.grid{grid-template-columns:-1fr}
-.preview-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
-.bottom{grid-template-columns:1fr}
-}
+<style id="pro-design-system">
+  :root {
+    --bg-color: #080b11;
+    --panel-bg: rgba(13, 20, 35, 0.65);
+    --panel-bg-solid: #0d1423;
+    --panel-border: rgba(255, 255, 255, 0.05);
+    --accent-color: #6366f1;
+    --accent-color-hover: #4f46e5;
+    --accent-glow: rgba(99, 102, 241, 0.4);
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
-@media (max-width: 720px){
-.layout{grid-template-columns:1fr}
-}
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-stack);
+    letter-spacing: -0.015em;
+  }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-color);
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
+    color: var(--text-primary);
+    padding: 12px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 13.5px;
+  }
+
+  .app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  /* Header Styling */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    padding: 0 4px;
+  }
+
+  .brand {
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-color);
+  }
+
+  .device-group {
+    display: flex;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 2px;
+  }
+
+  .device {
+    height: 30px;
+    padding: 0 16px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+  }
+
+  .device:hover {
+    color: var(--text-secondary);
+  }
+
+  .device.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Layout Styling */
+  .layout {
+    display: grid !important;
+    grid-template-columns: 260px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .sidebar {
+    background: var(--panel-bg) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 16px !important;
+    padding: 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  .main {
+    background: var(--panel-bg) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 16px !important;
+    padding: 16px 16px 0 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    min-width: 0 !important;
+  }
+
+  /* Inputs & Search */
+  .search {
+    height: 38px !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--panel-border) !important;
+    padding: 0 12px 0 28px !important;
+    color: var(--text-primary) !important;
+    font-size: 12.5px !important;
+    transition: var(--transition-smooth);
+    width: 100%;
+  }
+
+  .sidebar {
+    position: relative;
+  }
+
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    left: 22px;
+    top: 25px;
+    width: 12px;
+    height: 12px;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+
+  .search:focus {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+
+  /* Font List & Cards */
+  .font-list {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding-right: 2px;
+  }
+
+  .font-card {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid rgba(255, 255, 255, 0.02) !important;
+    border-radius: 12px !important;
+    padding: 10px 12px !important;
+    min-height: 60px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .font-card:hover {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    transform: translateY(-1px);
+  }
+
+  .font-card.active {
+    background: rgba(99, 102, 241, 0.12) !important;
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+  }
+
+  .font-name {
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: 2px !important;
+  }
+
+  .font-meta {
+    font-size: 10.5px !important;
+    color: var(--text-muted) !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* Inputs & Steppers */
+  .grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    overflow: visible !important;
+  }
+
+  .label {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .input-wrap {
+    display: flex !important;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    overflow: hidden;
+    height: 36px;
+    transition: var(--transition-smooth);
+  }
+
+  .input-wrap:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+
+  .input {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-primary) !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    outline: none !important;
+  }
+
+  .step {
+    width: 34px !important;
+    height: 100% !important;
+    border: none !important;
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    font-size: 18px !important;
+    font-weight: 400 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .step:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .step:active {
+    transform: scale(0.85);
+  }
+
+  /* Ratios Grid */
+  .ratios {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 8px !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .ratio {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    border-radius: 10px !important;
+    padding: 8px !important;
+    min-height: 54px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .ratio:hover {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+  }
+
+  .ratio.active {
+    background: rgba(99, 102, 241, 0.12) !important;
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+  }
+
+  .ratio strong {
+    font-size: 13.5px !important;
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+    display: block;
+  }
+
+  .ratio span {
+    font-size: 9.5px !important;
+    color: var(--text-muted) !important;
+    margin-top: 1px !important;
+    display: block;
+  }
+
+  /* Range Mapping Section */
+  .mapping-section {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 14px !important;
+    padding: 10px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    overflow: visible !important;
+  }
+
+  .mapping-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .mapping-row {
+    display: grid !important;
+    grid-template-columns: 1fr 110px 32px !important;
+    gap: 6px !important;
+    align-items: center !important;
+  }
+
+  .mapping-row div {
+    height: 32px !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 8px !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .mapping-row div:focus-within {
+    border-color: var(--accent-color) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+  }
+
+  .mapping-input {
+    height: 32px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    color: var(--text-primary) !important;
+    padding: 0 8px !important;
+    font-size: 12.5px !important;
+    outline: none !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .mapping-input:focus {
+    border-color: var(--accent-color) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+  }
+
+  .mapping-input[type="number"] {
+    text-align: center !important;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--panel-border) !important;
+    color: var(--text-secondary) !important;
+    padding: 5px 12px !important;
+    border-radius: 8px !important;
+    font-size: 10.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--text-primary) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .btn-add {
+    align-self: flex-start !important;
+    margin-top: 2px !important;
+  }
+
+  .btn-danger {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border: 1px solid rgba(239, 68, 68, 0.12) !important;
+    color: #fca5a5 !important;
+    height: 32px !important;
+    width: 32px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    transition: var(--transition-smooth) !important;
+    outline: none !important;
+    padding: 0 !important;
+  }
+
+  .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #ef4444 !important;
+    transform: scale(0.95);
+  }
+
+  /* Weights & Scale Preview Bottom Section */
+  .bottom {
+    display: grid !important;
+    grid-template-columns: 180px minmax(0, 1fr) !important;
+    gap: 16px !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .weights {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
+    gap: 6px !important;
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  .weight {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    color: var(--text-secondary) !important;
+    font-size: 11.5px !important;
+    font-weight: 500 !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .weight:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+  }
+
+  .weight.active {
+    background: rgba(99, 102, 241, 0.12) !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
+    color: #a5b4fc !important;
+  }
+
+  .weight input[type="checkbox"] {
+    display: none !important;
+  }
+
+  .weight::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transition: var(--transition-smooth);
+  }
+
+  .weight.active::after {
+    background: var(--accent-color);
+    box-shadow: 0 0 6px var(--accent-color);
+  }
+
+  .preview {
+    overflow: visible !important;
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    border-radius: 12px !important;
+    padding: 8px !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .preview-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 8px !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .preview-card {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-radius: 10px !important;
+    padding: 8px !important;
+    min-height: 82px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .preview-card:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    transform: translateY(-1px);
+  }
+
+  .preview-card small {
+    display: block !important;
+    color: var(--text-muted) !important;
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .preview-card div[style*="font-size"] {
+    font-weight: 500 !important;
+    opacity: 0.8 !important;
+    line-height: 1.1 !important;
+    margin: 3px 0 !important;
+  }
+
+  .preview-card div[style*="font-weight:700"] {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: var(--text-secondary) !important;
+    margin-top: 0 !important;
+  }
+
+  /* Elegant Sticky Footer */
+  .footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin-top: auto !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    background: rgba(13, 20, 35, 0.95) !important;
+    backdrop-filter: blur(8px) !important;
+    border-top: 1px solid var(--panel-border) !important;
+    margin-left: -16px !important;
+    margin-right: -16px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    z-index: 10 !important;
+  }
+
+  /* Custom Checkbox Toggle */
+  .toggle {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    color: var(--text-muted) !important;
+    user-select: none !important;
+    transition: var(--transition-smooth) !important;
+  }
+
+  .toggle:hover {
+    color: var(--text-secondary) !important;
+  }
+
+  .toggle input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 28px !important;
+    height: 16px !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    position: relative !important;
+    outline: none !important;
+    cursor: pointer !important;
+    transition: background 0.3s ease !important;
+    border: none !important;
+  }
+
+  .toggle input[type="checkbox"]:checked {
+    background: var(--accent-color) !important;
+  }
+
+  .toggle input[type="checkbox"]::before {
+    content: '' !important;
+    position: absolute !important;
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    background: white !important;
+    top: 2px !important;
+    left: 2px !important;
+    transition: transform 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) !important;
+  }
+
+  .toggle input[type="checkbox"]:checked::before {
+    transform: translateX(12px) !important;
+  }
+
+  .generate-btn {
+    height: 40px !important;
+    min-width: 220px !important;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    color: white !important;
+    cursor: pointer !important;
+    transition: var(--transition-spring) !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+  }
+
+  .generate-btn:hover {
+    filter: brightness(1.1) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.45) !important;
+  }
+
+  .generate-btn:active {
+    transform: translateY(1px) scale(0.98) !important;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2) !important;
+  }
+
+  /* Scrollbar Customization */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  /* Custom Ratio Styling inside ratio card */
+  #customRatioInput {
+    background: transparent !important;
+    border: none !important;
+    color: white !important;
+    font-size: 13.5px !important;
+    font-weight: bold !important;
+    outline: none !important;
+    text-align: center !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Draggable Resize Handle CSS */
+  #resize-handle {
+    position: fixed !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 14px !important;
+    height: 14px !important;
+    cursor: se-resize !important;
+    z-index: 999999 !important;
+    opacity: 0.35 !important;
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+    /* Premium diagonal grab lines */
+    background: linear-gradient(135deg,
+        transparent 0%, transparent 50%,
+        rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.4) 58%,
+        transparent 58%, transparent 70%,
+        rgba(255, 255, 255, 0.4) 70%, rgba(255, 255, 255, 0.4) 78%,
+        transparent 78%, transparent 90%,
+        rgba(255, 255, 255, 0.4) 90%, rgba(255, 255, 255, 0.4) 100%) !important;
+  }
+
+  #resize-handle:hover {
+    opacity: 0.85 !important;
+    transform: scale(1.1) !important;
+  }
+
+  body.resizing {
+    cursor: se-resize !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+
+  /* Fully Scalable Media Query Adjustments */
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 200px minmax(0, 1fr) !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .bottom {
+      grid-template-columns: 1fr !important;
+    }
+  }
 </style>
-
-<style id="ultimate-flex-fix">
-*{box-sizing:border-box}
-
-html,body{
-width:100%;
-height:100%;
-overflow:hidden;
-}
-
-body{
-display:flex;
-flex-direction:column;
-}
-
-.layout{
-display:grid !important;
-grid-template-columns:minmax(280px,340px) minmax(0,1fr) !important;
-gap:24px !important;
-width:100%;
-height:100vh;
-overflow:hidden;
-padding:0 !important;
-}
-
-.sidebar{
-display:flex !important;
-flex-direction:column !important;
-min-height:0 !important;
-overflow:hidden !important;
-}
-
-.font-search{
-flex-shrink:0;
-}
-
-.font-list{
-flex:1 !important;
-overflow-y:auto !important;
-overflow-x:hidden !important;
-padding-right:6px;
-min-height:0;
-}
-
-.font-card{
-display:flex !important;
-flex-direction:column !important;
-gap:10px !important;
-width:100%;
-min-height:120px;
-padding:18px !important;
-border-radius:18px !important;
-overflow:hidden !important;
-}
-
-.font-name{
-font-size:18px !important;
-line-height:1.2 !important;
-word-break:break-word;
-}
-
-.font-meta{
-font-size:13px !important;
-line-height:1.45 !important;
-opacity:.7;
-overflow:hidden;
-display:-webkit-box;
-line-clamp:3;
--webkit-line-clamp:3;
--webkit-box-orient:vertical;
-}
-
-.main{
-display:flex !important;
-flex-direction:column !important;
-overflow:hidden !important;
-min-width:0 !important;
-min-height:0 !important;
-gap:18px !important;
-}
-
-.topbar{
-display:flex !important;
-align-items:center !important;
-gap:18px !important;
-flex-wrap:wrap !important;
-}
-
-.controls{
-display:grid !important;
-grid-template-columns:repeat(2,minmax(240px,1fr)) !important;
-gap:16px !important;
-width:100%;
-}
-
-.field{
-width:100%;
-min-width:0;
-}
-
-.input-wrap{
-width:100%;
-display:grid !important;
-grid-template-columns:56px minmax(0,1fr) 56px !important;
-align-items:center;
-}
-
-.input{
-width:100% !important;
-min-width:0 !important;
-}
-
-.ratios{
-display:flex !important;
-flex-direction:column !important;
-gap:12px !important;
-overflow-y:auto !important;
-overflow-x:hidden !important;
-max-height:320px !important;
-padding-right:4px;
-}
-
-.ratio-card{
-width:100% !important;
-min-height:74px;
-}
-
-.bottom{
-display:grid !important;
-grid-template-columns:220px minmax(0,1fr) !important;
-gap:20px !important;
-overflow:visible !important;
-min-height:auto !important;
-height:auto !important;
-}
-
-.weights{
-display:flex !important;
-flex-direction:column !important;
-gap:12px !important;
-overflow-y:visible !important;
-max-height:none !important;
-min-height:auto !important;
-padding-right:4px;
-}
-
-.preview{
-overflow-y:auto !important;
-overflow-x:hidden !important;
-min-height:0 !important;
-height:100%;
-padding-right:6px;
-}
-
-.preview-grid{
-display:grid !important;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important;
-gap:14px !important;
-align-items:start !important;
-}
-
-.preview-card{
-width:100%;
-min-height:112px;
-display:flex !important;
-flex-direction:column !important;
-justify-content:center !important;
-}
-
-.footer{
-display:flex !important;
-align-items:center !important;
-justify-content:space-between !important;
-gap:18px !important;
-flex-wrap:wrap !important;
-
-}
-
-.generate-btn{
-min-width:320px !important;
-width:auto !important;
-}
-
-@media (max-width:1200px){
-.controls{
-grid-template-columns:1fr !important;
-}
-.bottom{
-grid-template-columns:1fr !important;
-}
-.weights{
-max-height:none !important;
-}
-}
-
-@media (max-width:820px){
-.layout{
-grid-template-columns:1fr !important;
-height:auto !important;
-overflow:auto !important;
-}
-.sidebar{
-max-height:420px;
-}
-.preview-grid{
-grid-template-columns:repeat(auto-fit,minmax(130px,1fr)) !important;
-}
-.generate-btn{
-width:100% !important;
-min-width:0 !important;
-}
-}
-</style>
-
-
-<style id="modern-ui-overwrite">
-:root{
---bg:#060B16;
---panel:#0C1324;
---panel2:#10192D;
---border:rgba(255,255,255,.06);
---accent:#23365F;
---accent2:#31456F;
---text:#ffffff;
---muted:rgba(255,255,255,.45);
-}
-
-*{
-box-sizing:border-box;
-}
-
-html,body{
-margin:0;
-padding:0;
-background:var(--bg);
-color:var(--text);
-font-family:Inter,sans-serif;
-overflow:hidden;
-height:100%;
-}
-
-body{
-padding:6px;
-}
-
-.layout{
-display:grid!important;
-grid-template-columns:320px minmax(0,1fr)!important;
-gap:20px!important;
-height:calc(100vh - 40px)!important;
-background:#060B16;
-border:1px solid var(--border);
-border-radius:28px;
-overflow:hidden;
-}
-
-.sidebar{
-background:#08101E;
-border-right:1px solid var(--border);
-padding:4px;
-display:flex;
-flex-direction:column;
-gap:18px;
-overflow:hidden;
-}
-
-.main{
-padding:24px;
-display:flex;
-flex-direction:column;
-gap:22px;
-overflow-y:auto;
-overflow-x:hidden;
-}
-
-input,button{
-outline:none;
-}
-
-.search{
-height:58px;
-border-radius:18px;
-background:#10192D;
-border:1px solid var(--border);
-padding:0 18px;
-font-size:16px;
-color:white;
-}
-
-.fonts{
-display:flex;
-flex-direction:column;
-gap:14px;
-overflow-y:auto;
-padding-right:4px;
-}
-
-.font-card{
-background:#0C1324!important;
-border:1px solid var(--border)!important;
-border-radius:22px!important;
-padding:18px!important;
-transition:.2s ease;
-min-height:120px;
-display:flex;
-flex-direction:column;
-justify-content:space-between;
-}
-
-.font-card.active{
-background:#23365F!important;
-border-color:#31456F!important;
-}
-
-.controls{
-display:grid!important;
-grid-template-columns:1fr 1fr!important;
-gap:18px!important;
-}
-
-.ratios{
-display:grid!important;
-grid-template-columns:repeat(5,minmax(0,1fr))!important;
-gap:12px!important;
-}
-
-.ratio-card,.preview-card,.weight-btn{
-background:#0C1324!important;
-border:1px solid var(--border)!important;
-border-radius:20px!important;
-}
-
-.bottom{
-display:grid!important;
-grid-template-columns:220px minmax(0,1fr)!important;
-gap:18px!important;
-}
-
-.preview-grid{
-display:grid!important;
-grid-template-columns:repeat(5,minmax(0,1fr))!important;
-gap:14px!important;
-}
-
-.preview-card{
-min-height:120px;
-padding:16px;
-}
-
-.generate-btn{
-height:64px;
-border:none;
-background:#23365F;
-border-radius:20px;
-font-size:18px;
-font-weight:600;
-color:white;
-padding:0 34px;
-}
-
-::-webkit-scrollbar{
-width:6px;
-height:6px;
-}
-
-::-webkit-scrollbar-thumb{
-background:#31456F;
-border-radius:20px;
-}
-</style>
-
-
-<style id="modern-ui-overwrite">
-:root{
---bg:#060B16;
---panel:#0C1324;
---panel2:#10192D;
---border:rgba(255,255,255,.06);
---accent:#23365F;
---accent2:#31456F;
---text:#ffffff;
---muted:rgba(255,255,255,.45);
-}
-
-*{
-box-sizing:border-box;
-}
-
-html,body{
-margin:0;
-padding:0;
-background:var(--bg);
-color:var(--text);
-font-family:Inter,sans-serif;
-overflow:hidden;
-height:100%;
-}
-
-body{
-padding:20px;
-}
-
-.layout{
-display:grid!important;
-grid-template-columns:320px minmax(0,1fr)!important;
-gap:20px!important;
-height:calc(100vh - 40px)!important;
-background:#060B16;
-border:1px solid var(--border);
-border-radius:28px;
-overflow:hidden;
-}
-
-.sidebar{
-background:#08101E;
-border-right:1px solid var(--border);
-padding:0px;
-display:flex;
-flex-direction:column;
-gap:0px;
-overflow:hidden;
-}
-
-.main{
-padding:24px;
-display:flex;
-flex-direction:column;
-gap:22px;
-overflow-y:auto;
-overflow-x:hidden;
-}
-
-input,button{
-outline:none;
-}
-
-.search{
-height:58px;
-border-radius:18px;
-background:#10192D;
-border:1px solid var(--border);
-padding:0 18px;
-font-size:16px;
-color:white;
-}
-
-.fonts{
-display:flex;
-flex-direction:column;
-gap:14px;
-overflow-y:auto;
-padding-right:4px;
-}
-
-.font-card{
-background:#0C1324!important;
-border:1px solid var(--border)!important;
-border-radius:22px!important;
-padding:18px!important;
-transition:.2s ease;
-min-height:120px;
-display:flex;
-flex-direction:column;
-justify-content:space-between;
-}
-
-.font-card.active{
-background:#23365F!important;
-border-color:#31456F!important;
-}
-
-.controls{
-display:grid!important;
-grid-template-columns:1fr 1fr!important;
-gap:18px!important;
-}
-
-.ratios{
-display:grid!important;
-grid-template-columns:repeat(5,minmax(0,1fr))!important;
-gap:12px!important;
-}
-
-.ratio-card,.preview-card,.weight-btn{
-background:#0C1324!important;
-border:1px solid var(--border)!important;
-border-radius:20px!important;
-}
-
-.bottom{
-display:grid!important;
-grid-template-columns:220px minmax(0,1fr)!important;
-gap:18px!important;
-}
-
-.preview-grid{
-display:grid!important;
-grid-template-columns:repeat(5,minmax(0,1fr))!important;
-gap:14px!important;
-}
-
-.preview-card{
-min-height:120px;
-padding:16px;
-}
-
-.generate-btn{
-height:64px;
-border:none;
-background:#23365F;
-border-radius:20px;
-font-size:18px;
-font-weight:600;
-color:white;
-padding:0 34px;
-}
-
-::-webkit-scrollbar{
-width:6px;
-height:6px;
-}
-
-::-webkit-scrollbar-thumb{
-background:#31456F;
-border-radius:20px;
-}
-</style>
-
-
-<style id="exact-figma-ui-fix">
-:root{
---bg:#050B16;
---panel:#0B1220;
---panel2:#10192D;
---accent:#24365D;
---accent2:#31456F;
---border:rgba(255,255,255,.06);
---text:#ffffff;
---muted:rgba(255,255,255,.42);
-}
-
-*{
-box-sizing:border-box;
-}
-
-html,body{
-margin:0;
-padding:0;
-width:100%;
-height:100%;
-overflow:hidden;
-background:var(--bg);
-font-family:Inter,sans-serif;
-color:var(--text);
-}
-
-body{
-padding:12px;
-}
-
-.layout{
-display:grid!important;
-grid-template-columns:minmax(250px,320px) minmax(0,1fr)!important;
-height:calc(100vh - 24px)!important;
-background:#050B16;
-border-radius:22px;
-overflow:hidden;
-border:1px solid rgba(255,255,255,.04);
-}
-
-.sidebar{
-padding:18px!important;
-display:flex!important;
-flex-direction:column!important;
-gap:14px!important;
-overflow:hidden!important;
-background:#07101D!important;
-}
-
-.logo{
-display:flex;
-align-items:center;
-gap:12px;
-}
-
-.search,
-.search-input{
-height:44px!important;
-min-height:44px!important;
-border-radius:14px!important;
-background:#0E1729!important;
-border:1px solid rgba(255,255,255,.06)!important;
-padding:0 14px!important;
-font-size:14px!important;
-color:white!important;
-}
-
-.search::placeholder{
-color:rgba(255,255,255,.26)!important;
-}
-
-.fonts,
-.font-list{
-display:flex!important;
-flex-direction:column!important;
-gap:10px!important;
-overflow-y:auto!important;
-padding-right:4px!important;
-}
-
-.font-card{
-background:#0C1324!important;
-border:1px solid rgba(255,255,255,.05)!important;
-border-radius:18px!important;
-padding:14px!important;
-min-height:102px!important;
-display:flex!important;
-flex-direction:column!important;
-justify-content:space-between!important;
-transition:.2s ease!important;
-}
-
-.font-card.active{
-background:#24365D!important;
-border-color:#31456F!important;
-}
-
-.font-name{
-font-size:14px!important;
-font-weight:600!important;
-line-height:1.2!important;
-}
-
-.font-meta{
-font-size:11px!important;
-line-height:1.45!important;
-color:rgba(255,255,255,.4)!important;
-}
-
-.main{
-padding:18px!important;
-display:flex!important;
-flex-direction:column!important;
-gap:18px!important;
-overflow:auto!important;
-}
-
-.topbar{
-display:flex!important;
-align-items:center!important;
-justify-content:space-between!important;
-gap:14px!important;
-}
-
-.device-group{
-display:flex!important;
-gap:14px!important;
-}
-
-.device-btn{
-height:44px!important;
-min-width:140px!important;
-border-radius:14px!important;
-font-size:14px!important;
-font-weight:600!important;
-}
-
-.controls{
-display:grid!important;
-grid-template-columns:1fr 1fr!important;
-gap:14px!important;
-}
-
-.control-card{
-display:flex!important;
-flex-direction:column!important;
-gap:8px!important;
-}
-
-.control-input{
-height:54px!important;
-border-radius:14px!important;
-padding:0 16px!important;
-font-size:16px!important;
-}
-
-.ratios{
-display:grid!important;
-grid-template-columns:repeat(5,minmax(0,1fr))!important;
-gap:10px!important;
-}
-
-.ratio-card{
-min-height:78px!important;
-border-radius:16px!important;
-padding:12px!important;
-background:#0C1324!important;
-border:1px solid rgba(255,255,255,.05)!important;
-}
-
-.ratio-value{
-font-size:18px!important;
-color:rgba(255,255,255,.55)!important;
-}
-
-.ratio-title{
-font-size:11px!important;
-font-weight:600!important;
-margin-top:4px!important;
-}
-
-.bottom{
-display:grid!important;
-grid-template-columns:160px minmax(0,1fr)!important;
-gap:16px!important;
-}
-
-.weights{
-display:flex!important;
-flex-direction:column!important;
-gap:8px!important;
-}
-
-.weight-btn{
-height:40px!important;
-border-radius:12px!important;
-font-size:12px!important;
-padding:0 12px!important;
-}
-
-.preview-grid{
-display:grid!important;
-grid-template-columns:repeat(5,minmax(0,1fr))!important;
-gap:10px!important;
-}
-
-.preview-card{
-min-height:92px!important;
-border-radius:16px!important;
-padding:12px!important;
-background:#0C1324!important;
-border:1px solid rgba(255,255,255,.05)!important;
-}
-
-.preview-title{
-font-size:12px!important;
-color:rgba(255,255,255,.38)!important;
-}
-
-.preview-size{
-font-size:18px!important;
-font-weight:700!important;
-margin-top:12px!important;
-}
-
-.footer{
-display:flex!important;
-align-items:center!important;
-justify-content:space-between!important;
-gap:14px!important;
-margin-top:auto!important;
-}
-
-.generate-btn{
-height:50px!important;
-min-width:320px!important;
-border-radius:14px!important;
-background:#24365D!important;
-font-size:15px!important;
-font-weight:600!important;
-border:none!important;
-color:white!important;
-}
-
-@media (max-width:1200px){
-
-.layout{
-grid-template-columns:260px minmax(0,1fr)!important;
-}
-
-.ratios{
-grid-template-columns:repeat(5,minmax(0,1fr))!important;
-}
-
-.preview-grid{
-grid-template-columns:repeat(4,minmax(0,1fr))!important;
-}
-
-.device-btn{
-min-width:110px!important;
-}
-
-.generate-btn{
-min-width:240px!important;
-}
-}
-
-@media (max-width:900px){
-
-body{
-padding:8px;
-}
-
-.layout{
-grid-template-columns:220px minmax(0,1fr)!important;
-height:calc(100vh - 16px)!important;
-}
-
-.sidebar,
-.main{
-padding:12px!important;
-}
-
-.controls{
-gap:10px!important;
-}
-
-.ratios{
-grid-template-columns:repeat(2,minmax(0,1fr))!important;
-}
-
-.preview-grid{
-grid-template-columns:repeat(3,minmax(0,1fr))!important;
-}
-
-.device-btn{
-height:38px!important;
-min-width:92px!important;
-font-size:12px!important;
-}
-
-.generate-btn{
-height:44px!important;
-min-width:180px!important;
-font-size:13px!important;
-}
-}
-
-::-webkit-scrollbar{
-width:5px;
-height:5px;
-}
-
-::-webkit-scrollbar-thumb{
-background:#31456F;
-border-radius:20px;
-}
-
-.mapping-section {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
-}
-.mapping-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.mapping-row {
-  display: grid;
-  grid-template-columns: 1fr 130px 36px;
-  gap: 10px;
-  align-items: center;
-}
-.mapping-input {
-  height: 38px !important;
-  border-radius: 10px !important;
-  border: 1px solid var(--border) !important;
-  background: #0E1729 !important;
-  color: white !important;
-  padding: 0 12px !important;
-  font-size: 13px !important;
-  outline: none !important;
-  width: 100%;
-}
-.mapping-input:focus {
-  border-color: var(--accent2) !important;
-}
-.mapping-input[type="number"] {
-  text-align: center;
-}
-.btn-secondary {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.btn-secondary:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.15);
-}
-.btn-danger {
-  background: rgba(239, 68, 68, 0.1) !important;
-  border: 1px solid rgba(239, 68, 68, 0.2) !important;
-  color: #ef4444 !important;
-  height: 36px !important;
-  width: 36px !important;
-  border-radius: 10px !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 18px !important;
-  font-weight: bold !important;
-  transition: all 0.2s ease !important;
-  outline: none !important;
-  padding: 0 !important;
-}
-.btn-danger:hover {
-  background: rgba(239, 68, 68, 0.2) !important;
-  border-color: rgba(239, 68, 68, 0.4) !important;
-}
-.btn-add {
-  align-self: flex-start;
-  margin-top: 2px;
-}
-</style>
-
 </head>
+
 <body>
-<div class="app">
-<div class="header">
-<div class="brand">Advance Typography Generator</div>
-<div class="device-group">
-<button class="device active">Desktop</button>
-<button class="device">Tablet</button>
-<button class="device">Mobile</button>
-</div>
-</div>
-<div class="layout">
-<div class="sidebar">
-<input class="search" id="search" placeholder="Search fonts..." />
-<div class="font-list fonts" id="fontList"></div>
-</div>
-<div class="main">
-<div class="grid">
-<div class="field">
-<div class="label">Base Size</div>
-<div class="input-wrap">
-<button class="step" onclick="adjust('baseSize',-1)">−</button>
-<input id="baseSize" class="input" value="16" />
-<button class="step" onclick="adjust('baseSize',1)">+</button>
-</div></div>
-<div class="field">
-<div class="label">Variants</div>
-<div class="input-wrap">
-<button class="step" onclick="adjust('variants',-1)">−</button>
-<input id="variants" class="input" value="8" />
-<button class="step" onclick="adjust('variants',1)">+</button>
-</div></div>
-</div>
-<div class="field">
-<div class="label">Scale Ratio</div>
-<div class="ratios">
-<div class="ratio active" data-ratio="1.2"><strong>1.2</strong><span>Minor Third</span></div>
-<div class="ratio" data-ratio="1.25"><strong>1.25</strong><span>Major Third</span></div>
-<div class="ratio" data-ratio="1.414"><strong>1.414</strong><span>Augmented</span></div>
-<div class="ratio" data-ratio="1.618"><strong>1.618</strong><span>Golden Ratio</span></div>
-<div class="ratio" id="customRatioCard">
-  <input type="number" id="customRatioInput" placeholder="ex: 1.5" step="0.01" style="display:none; width:100%; background:transparent; border:none; color:white; font-size:16px; font-weight:bold; outline:none; padding:0; margin-bottom:2px;" />
-  <strong id="customRatioLabel" style="font-size:16px;">Custom</strong>
-  <span>Ratio</span>
-</div>
-</div></div>
+  <div class="app">
+    <div class="header">
+      <div class="brand">Advance Typography Generator</div>
+      <div class="device-group">
+        <button class="device active">Desktop</button>
+        <button class="device">Tablet</button>
+        <button class="device">Mobile</button>
+      </div>
+    </div>
+    <div class="layout">
+      <div class="sidebar">
+        <input class="search" id="search" placeholder="Search fonts..." />
+        <div class="font-list fonts" id="fontList"></div>
+      </div>
+      <div class="main">
+        <div class="grid">
+          <div class="field">
+            <div class="label">Base Size</div>
+            <div class="input-wrap">
+              <button class="step" onclick="adjust('baseSize',-1)">−</button>
+              <input id="baseSize" class="input" value="16" />
+              <button class="step" onclick="adjust('baseSize',1)">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Variants</div>
+            <div class="input-wrap">
+              <button class="step" onclick="adjust('variants',-1)">−</button>
+              <input id="variants" class="input" value="8" />
+              <button class="step" onclick="adjust('variants',1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label">Scale Ratio</div>
+          <div class="ratios">
+            <div class="ratio active" data-ratio="1.2"><strong>1.2</strong><span>Minor Third</span></div>
+            <div class="ratio" data-ratio="1.25"><strong>1.25</strong><span>Major Third</span></div>
+            <div class="ratio" data-ratio="1.414"><strong>1.414</strong><span>Augmented</span></div>
+            <div class="ratio" data-ratio="1.618"><strong>1.618</strong><span>Golden Ratio</span></div>
+            <div class="ratio" id="customRatioCard">
+              <input type="number" id="customRatioInput" placeholder="ex: 1.5" step="0.01"
+                style="display:none; width:100%; background:transparent; border:none; color:white; font-size:16px; font-weight:bold; outline:none; padding:0; margin-bottom:2px;" />
+              <strong id="customRatioLabel" style="font-size:16px;">Custom</strong>
+              <span>Ratio</span>
+            </div>
+          </div>
+        </div>
 
-<div class="field" style="margin-top: 8px;">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <div class="label">Typography Range Mapping</div>
-    <button class="btn-secondary" onclick="resetMappingToDefaults()">Reset to Defaults</button>
+        <div class="field" style="margin-top: 8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="label">Typography Range Mapping</div>
+            <button class="btn-secondary" onclick="resetMappingToDefaults()">Reset to Defaults</button>
+          </div>
+          <div class="mapping-section">
+            <div class="mapping-list" id="mappingList"></div>
+            <button class="btn-secondary btn-add" onclick="addMappingRow()">+ Add Category</button>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <div>
+            <div class="label" style="margin-bottom:8px">Weights</div>
+            <div class="weights" id="weights"></div>
+          </div>
+          <div>
+            <div class="label" style="margin-bottom:8px">Scale Preview</div>
+            <div class="preview">
+              <div class="preview-grid" id="preview"></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <label class="toggle"><input type="checkbox" checked /> Create Design Preview</label>
+          <button class="generate generate-btn" id="generate">Generate Typography System</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="mapping-section">
-    <div class="mapping-list" id="mappingList"></div>
-    <button class="btn-secondary btn-add" onclick="addMappingRow()">+ Add Category</button>
-  </div>
-</div>
+  <script>
+    let currentFont = '';
+    let currentDevice = 'Desktop';
+    let currentRatio = 1.2;
+    let allFonts = [];
+    let rangeMappings = [];
+    let userCustomized = false;
 
-<div class="bottom">
-<div>
-<div class="label" style="margin-bottom:8px">Weights</div>
-<div class="weights" id="weights"></div>
-</div>
-<div>
-<div class="label" style="margin-bottom:8px">Scale Preview</div>
-<div class="preview"><div class="preview-grid" id="preview"></div></div>
-</div>
-</div>
-<div class="footer">
-<label class="toggle"><input type="checkbox" checked /> Create Design Preview</label>
-<button class="generate generate-btn" id="generate">Generate Typography System</button>
-</div>
-</div>
-</div>
-</div>
-<script>
-let currentFont = '';
-let currentDevice = 'Desktop';
-let currentRatio = 1.2;
-let allFonts = [];
-let rangeMappings = [];
-let userCustomized = false;
-
-const weightLabels = {
-Thin:'Thin',ExtraLight:'Extra Light',Light:'Light',Regular:'Regular',Medium:'Medium',SemiBold:'Semi Bold',Bold:'Bold',ExtraBold:'Extra Bold',Black:'Black'
-};
-
-function normalize(v){return v.toLowerCase().replace(/[^a-z0-9]/g,'')}
-
-function getSmartDefaultMappings(scale) {
-  if (!scale || scale.length === 0) {
-    return [
-      { prefix: 'Hero', minSize: 38 },
-      { prefix: 'H', minSize: 17 },
-      { prefix: 'P', minSize: 12 },
-      { prefix: 'Caption', minSize: 10 },
-      { prefix: 'Label', minSize: 8 }
-    ];
-  }
-  const max = scale[0] || 16;
-  let heroThreshold = 38;
-  let headingThreshold = 17;
-  let paragraphThreshold = 12;
-  let captionThreshold = 10;
-  let labelThreshold = 8;
-  
-  if (max < 24) {
-    heroThreshold = 999;
-    headingThreshold = 15;
-    paragraphThreshold = 12;
-    captionThreshold = 10;
-    labelThreshold = 8;
-  } else if (max < 32) {
-    heroThreshold = 28;
-    headingThreshold = 16;
-    paragraphThreshold = 12;
-    captionThreshold = 10;
-    labelThreshold = 8;
-  }
-  
-  const assigned = scale.map(size => {
-    if (size >= heroThreshold) return { size, prefix: 'Hero' };
-    if (size >= headingThreshold) return { size, prefix: 'H' };
-    if (size >= paragraphThreshold) return { size, prefix: 'P' };
-    if (size >= captionThreshold) return { size, prefix: 'Caption' };
-    return { size, prefix: 'Label' };
-  });
-
-  const uniqueMappings = [];
-  const prefixes = [...new Set(assigned.map(x => x.prefix))];
-  
-  prefixes.forEach(prefix => {
-    const sizesWithPrefix = assigned.filter(x => x.prefix === prefix).map(x => x.size);
-    const minSizeForPrefix = Math.min(...sizesWithPrefix);
-    uniqueMappings.push({ prefix, minSize: minSizeForPrefix });
-  });
-
-  return uniqueMappings;
-}
-
-function resetMappingToDefaults() {
-  userCustomized = false;
-  const base = Number(document.getElementById('baseSize').value) || 16;
-  const count = Number(document.getElementById('variants').value) || 8;
-  const arr = []; let current = base;
-  for (let i = 0; i < count; i++) { arr.unshift(Math.round(current)); current *= currentRatio; }
-  rangeMappings = getSmartDefaultMappings(arr);
-  renderMappings();
-  renderPreview();
-}
-
-function addMappingRow() {
-  userCustomized = true;
-  
-  // Calculate a reasonable minSize for the new custom row based on scale
-  const base = Number(document.getElementById('baseSize').value) || 16;
-  const count = Number(document.getElementById('variants').value) || 8;
-  const arr = []; let current = base;
-  for (let i = 0; i < count; i++) { arr.unshift(Math.round(current)); current *= currentRatio; }
-  
-  const lowestExisting = rangeMappings.length > 0 ? Math.min(...rangeMappings.map(m => m.minSize)) : 0;
-  const candidateSizes = arr.filter(s => s < lowestExisting);
-  const newMin = candidateSizes.length > 0 ? candidateSizes[candidateSizes.length - 1] : (lowestExisting > 0 ? lowestExisting - 1 : 12);
-  
-  rangeMappings.push({ prefix: 'Custom', minSize: newMin });
-  renderMappings();
-  renderPreview();
-}
-
-function removeMappingRow(index) {
-  userCustomized = true;
-  rangeMappings.splice(index, 1);
-  renderMappings();
-  renderPreview();
-}
-
-function updateMappingField(index, field, value) {
-  userCustomized = true;
-  if (field === 'minSize') {
-    rangeMappings[index][field] = Number(value) || 0;
-  } else {
-    rangeMappings[index][field] = value;
-  }
-  renderMappings();
-  renderPreview();
-}
-
-function getSemanticName(prefix, indexInGroup, totalInGroup) {
-  const cleanPrefix = prefix.trim();
-  const isSingleLetter = /^[hHpP]$/.test(cleanPrefix);
-
-  if (isSingleLetter) {
-    return `${cleanPrefix.toUpperCase()}${indexInGroup + 1}`;
-  }
-
-  if (totalInGroup === 1) {
-    return cleanPrefix;
-  }
-
-  if (indexInGroup === 0) {
-    return cleanPrefix;
-  }
-
-  return `${cleanPrefix} ${indexInGroup + 1}`;
-}
-
-function getCategoryForSize(size, mappings) {
-  const sorted = [...mappings].sort((a, b) => b.minSize - a.minSize);
-  for (const m of sorted) {
-    if (size >= m.minSize) {
-      return m;
-    }
-  }
-  return sorted[sorted.length - 1] || { prefix: 'Label', minSize: size };
-}
-
-function computeSemanticNames(scale, mappings) {
-  const mapped = scale.map((size) => {
-    const cat = getCategoryForSize(size, mappings);
-    return {
-      size,
-      prefix: cat.prefix
+    const weightLabels = {
+      Thin: 'Thin', ExtraLight: 'Extra Light', Light: 'Light', Regular: 'Regular', Medium: 'Medium', SemiBold: 'Semi Bold', Bold: 'Bold', ExtraBold: 'Extra Bold', Black: 'Black'
     };
-  });
 
-  const prefixCounts = {};
-  mapped.forEach((item) => {
-    prefixCounts[item.prefix] = (prefixCounts[item.prefix] || 0) + 1;
-  });
+    function normalize(v) { return v.toLowerCase().replace(/[^a-z0-9]/g, '') }
 
-  const prefixIndices = {};
-  const semanticNames = scale.map((size) => {
-    const cat = getCategoryForSize(size, mappings);
-    const prefix = cat.prefix;
-    const total = prefixCounts[prefix];
-    const index = prefixIndices[prefix] || 0;
-    prefixIndices[prefix] = index + 1;
+    // Smart Default Mappings
+    function getSmartDefaultMappings(scale) {
+      if (!scale || scale.length === 0) {
+        return [
+          { prefix: 'Hero', minSize: 38 },
+          { prefix: 'H', minSize: 17 },
+          { prefix: 'P', minSize: 12 },
+          { prefix: 'Caption', minSize: 10 },
+          { prefix: 'Label', minSize: 8 }
+        ];
+      }
+      const max = scale[0] || 16;
+      let heroThreshold = 38;
+      let headingThreshold = 17;
+      let paragraphThreshold = 12;
+      let captionThreshold = 10;
+      let labelThreshold = 8;
 
-    return getSemanticName(prefix, index, total);
-  });
+      if (max < 24) {
+        heroThreshold = 999;
+        headingThreshold = 15;
+        paragraphThreshold = 12;
+        captionThreshold = 10;
+        labelThreshold = 8;
+      } else if (max < 32) {
+        heroThreshold = 28;
+        headingThreshold = 16;
+        paragraphThreshold = 12;
+        captionThreshold = 10;
+        labelThreshold = 8;
+      }
 
-  return semanticNames;
-}
+      const assigned = scale.map(size => {
+        if (size >= heroThreshold) return { size, prefix: 'Hero' };
+        if (size >= headingThreshold) return { size, prefix: 'H' };
+        if (size >= paragraphThreshold) return { size, prefix: 'P' };
+        if (size >= captionThreshold) return { size, prefix: 'Caption' };
+        return { size, prefix: 'Label' };
+      });
 
-function renderMappings() {
-  const container = document.getElementById('mappingList');
-  container.innerHTML = '';
-  
-  const base = Number(document.getElementById('baseSize').value) || 16;
-  const count = Number(document.getElementById('variants').value) || 8;
-  const scale = []; let current = base;
-  for (let i = 0; i < count; i++) { scale.unshift(Math.round(current)); current *= currentRatio; }
-  
-  const absMax = scale.length > 0 ? scale[0] : 999;
-  const absMin = scale.length > 0 ? scale[scale.length - 1] : 0;
-  
-  rangeMappings.sort((a, b) => b.minSize - a.minSize);
-  
-  rangeMappings.forEach((mapping, index) => {
-    const row = document.createElement('div');
-    row.className = 'mapping-row';
-    
-    // Find the exact maximum size from the scale that falls into this category
-    let actualMax = absMax;
-    if (index > 0) {
-      const prevMin = rangeMappings[index - 1].minSize;
-      const validSizes = scale.filter(s => s < prevMin);
-      actualMax = validSizes.length > 0 ? Math.max(...validSizes) : mapping.minSize;
+      const uniqueMappings = [];
+      const prefixes = [...new Set(assigned.map(x => x.prefix))];
+
+      prefixes.forEach(prefix => {
+        const sizesWithPrefix = assigned.filter(x => x.prefix === prefix).map(x => x.size);
+        const minSizeForPrefix = Math.min(...sizesWithPrefix);
+        uniqueMappings.push({ prefix, minSize: minSizeForPrefix });
+      });
+
+      return uniqueMappings;
     }
-    
-    // Find the exact minimum size from the scale that falls into this category
-    let nextMin = index < rangeMappings.length - 1 ? rangeMappings[index + 1].minSize : absMin;
-    const sizesInCat = scale.filter(s => s >= mapping.minSize && (index === 0 || s <= actualMax));
-    
-    // Lock the first row's max size
-    const isFirst = index === 0;
-    // Lock the last row's min size indicator (we still let them edit the boundary input to shrink/grow, but it shouldn't go below absMin)
-    const isLast = index === rangeMappings.length - 1;
-    
-    const displayMax = actualMax;
-    
-    row.innerHTML = `
+
+    function resetMappingToDefaults() {
+      userCustomized = false;
+      const base = Number(document.getElementById('baseSize').value) || 16;
+      const count = Number(document.getElementById('variants').value) || 8;
+      const arr = []; let current = base;
+      for (let i = 0; i < count; i++) { arr.unshift(Math.round(current)); current *= currentRatio; }
+      rangeMappings = getSmartDefaultMappings(arr);
+      renderMappings();
+      renderPreview();
+    }
+
+    function addMappingRow() {
+      userCustomized = true;
+
+      const base = Number(document.getElementById('baseSize').value) || 16;
+      const count = Number(document.getElementById('variants').value) || 8;
+      const arr = []; let current = base;
+      for (let i = 0; i < count; i++) { arr.unshift(Math.round(current)); current *= currentRatio; }
+
+      const lowestExisting = rangeMappings.length > 0 ? Math.min(...rangeMappings.map(m => m.minSize)) : 0;
+      const candidateSizes = arr.filter(s => s < lowestExisting);
+      const newMin = candidateSizes.length > 0 ? candidateSizes[candidateSizes.length - 1] : (lowestExisting > 0 ? lowestExisting - 1 : 12);
+
+      rangeMappings.push({ prefix: 'Custom', minSize: newMin });
+      renderMappings();
+      renderPreview();
+    }
+
+    function removeMappingRow(index) {
+      userCustomized = true;
+      rangeMappings.splice(index, 1);
+      renderMappings();
+      renderPreview();
+    }
+
+    function updateMappingField(index, field, value) {
+      userCustomized = true;
+      if (field === 'minSize') {
+        rangeMappings[index][field] = Number(value) || 0;
+        renderMappings();
+      } else {
+        rangeMappings[index][field] = value;
+      }
+      renderPreview();
+    }
+
+    function getSemanticName(prefix, indexInGroup, totalInGroup) {
+      const cleanPrefix = prefix.trim();
+      const isSingleLetter = /^[hHpP]$/.test(cleanPrefix);
+
+      if (isSingleLetter) {
+        return `${cleanPrefix.toUpperCase()}${indexInGroup + 1}`;
+      }
+
+      if (totalInGroup === 1) {
+        return cleanPrefix;
+      }
+
+      if (indexInGroup === 0) {
+        return cleanPrefix;
+      }
+
+      return `${cleanPrefix} ${indexInGroup + 1}`;
+    }
+
+    function getCategoryForSize(size, mappings) {
+      const sorted = [...mappings].sort((a, b) => b.minSize - a.minSize);
+      for (const m of sorted) {
+        if (size >= m.minSize) {
+          return m;
+        }
+      }
+      return sorted[sorted.length - 1] || { prefix: 'Label', minSize: size };
+    }
+
+    function computeSemanticNames(scale, mappings) {
+      const mapped = scale.map((size) => {
+        const cat = getCategoryForSize(size, mappings);
+        return {
+          size,
+          prefix: cat.prefix
+        };
+      });
+
+      const prefixCounts = {};
+      mapped.forEach((item) => {
+        prefixCounts[item.prefix] = (prefixCounts[item.prefix] || 0) + 1;
+      });
+
+      const prefixIndices = {};
+      const semanticNames = scale.map((size) => {
+        const cat = getCategoryForSize(size, mappings);
+        const prefix = cat.prefix;
+        const total = prefixCounts[prefix];
+        const index = prefixIndices[prefix] || 0;
+        prefixIndices[prefix] = index + 1;
+
+        return getSemanticName(prefix, index, total);
+      });
+
+      return semanticNames;
+    }
+
+    function renderMappings() {
+      const container = document.getElementById('mappingList');
+      container.innerHTML = '';
+
+      const base = Number(document.getElementById('baseSize').value) || 16;
+      const count = Number(document.getElementById('variants').value) || 8;
+      const scale = []; let current = base;
+      for (let i = 0; i < count; i++) { scale.unshift(Math.round(current)); current *= currentRatio; }
+
+      const absMax = scale.length > 0 ? scale[0] : 999;
+      const absMin = scale.length > 0 ? scale[scale.length - 1] : 0;
+
+      rangeMappings.sort((a, b) => b.minSize - a.minSize);
+
+      rangeMappings.forEach((mapping, index) => {
+        const row = document.createElement('div');
+        row.className = 'mapping-row';
+
+        let actualMax = absMax;
+        if (index > 0) {
+          const prevMin = rangeMappings[index - 1].minSize;
+          const validSizes = scale.filter(s => s < prevMin);
+          actualMax = validSizes.length > 0 ? Math.max(...validSizes) : mapping.minSize;
+        }
+
+        let nextMin = index < rangeMappings.length - 1 ? rangeMappings[index + 1].minSize : absMin;
+        const sizesInCat = scale.filter(s => s >= mapping.minSize && (index === 0 || s <= actualMax));
+
+        const isFirst = index === 0;
+        const isLast = index === rangeMappings.length - 1;
+        const displayMax = actualMax;
+
+        row.innerHTML = `
       <input type="text" class="mapping-input" value="${mapping.prefix}" oninput="updateMappingField(${index}, 'prefix', this.value)" placeholder="Category Prefix" />
-      <div style="display:flex; align-items:center; gap: 4px; background: #0E1729; border: 1px solid var(--border); border-radius: 10px; padding: 0 8px; height: 38px; width: 100%; box-sizing: border-box;">
+      <div style="display:flex; align-items:center; gap: 4px; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 10px; padding: 0 8px; height: 38px; width: 100%; box-sizing: border-box;">
         <span style="color: #6B7280; font-size: 13px; flex: 1; text-align: right; user-select: none;">${displayMax}px</span>
         <span style="color: #4B5563; padding: 0 4px;">-</span>
         <input type="number" class="mapping-input" style="height: 100% !important; border: none !important; background: transparent !important; padding: 0 !important; width: 40px; text-align: left;" value="${mapping.minSize}" onchange="updateMappingField(${index}, 'minSize', this.value)" />
       </div>
       <button class="btn-danger" onclick="removeMappingRow(${index})" ${rangeMappings.length <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>×</button>
     `;
-    container.appendChild(row);
-  });
-}
-
-
-const loadedFonts = new Set();
-
-function loadGoogleFont(fontFamily){
- if(!fontFamily || loadedFonts.has(fontFamily)) return;
- loadedFonts.add(fontFamily);
-
- const cleanFamily = fontFamily.replace(/['"]/g,'');
-
- const link=document.createElement('link');
- link.rel='stylesheet';
- link.href=`https://fonts.googleapis.com/css2?family=${encodeURIComponent(cleanFamily).replace(/%20/g,'+')}:wght@400;500;600;700&display=swap`;
-
- document.head.appendChild(link);
-}
-
-const fontObserver = new IntersectionObserver((entries)=>{
- entries.forEach(entry=>{
-   if(entry.isIntersecting){
-     const family = entry.target.dataset.fontFamily;
-     loadGoogleFont(family);
-     fontObserver.unobserve(entry.target);
-   }
- });
-},{rootMargin:'200px'});
-
-function renderFonts(list){
- const root=document.getElementById('fontList');
- root.innerHTML='';
- list.forEach((font,index)=>{
- const card=document.createElement('div');
- card.className='font-card'+(index===0?' active':'');
- card.dataset.fontFamily = font.family;
- const variants = [...new Set(font.styles)].join(' • ');
- card.innerHTML=`<div class=\"font-name\" style=\"font-family:'${font.family}',sans-serif;font-weight:600\">${font.family}</div><div class=\"font-meta\">${variants}</div>`;
- card.onclick=()=>{
- document.querySelectorAll('.font-card').forEach(el=>el.classList.remove('active'));
- card.classList.add('active');
- currentFont=font.family;
- renderWeights(font.styles);
- };
- root.appendChild(card);
- fontObserver.observe(card);
- if(index===0 && !currentFont){currentFont=font.family;renderWeights(font.styles)}
- })
-}
-
-function renderWeights(styles){
- const root=document.getElementById('weights');
- root.innerHTML='';
- [...new Set(styles)].forEach(style=>{
- const label=weightLabels[style.replace(/\s/g,'')]||style;
- const item=document.createElement('div');
- item.className='weight active';
- item.dataset.style=style; // Send exact Figma style string!
- item.innerHTML=`<span>${label}</span><input checked type="checkbox">`;
- item.onclick=()=>{item.classList.toggle('active');item.querySelector('input').checked=item.classList.contains('active')}
- root.appendChild(item);
- })
-}
-
-function renderPreview(){
- const base=Number(document.getElementById('baseSize').value)||16;
- const count=Number(document.getElementById('variants').value)||8;
- const arr=[]; let current=base;
- for(let i=0;i<count;i++){arr.unshift(Math.round(current));current*=currentRatio}
- 
- if (!userCustomized) {
-   rangeMappings = getSmartDefaultMappings(arr);
-   renderMappings();
- }
- 
- const semanticNames = computeSemanticNames(arr, rangeMappings);
- 
- const root=document.getElementById('preview');
- root.innerHTML='';
- arr.forEach((size,index)=>{
- loadGoogleFont(currentFont);
- const semName = semanticNames[index] || `Size ${index+1}`;
- root.innerHTML += `<div class="preview-card"><small>${semName}</small><div style="font-size:${Math.min(size,48)}px;font-family:'${currentFont}',sans-serif">Aa</div><div style="margin-top:10px;font-weight:700">${size}px</div></div>`
- })
-}
-
-function adjust(id,val){
- const el=document.getElementById(id);
- el.value=Math.max(1,Number(el.value)+val);
- renderPreview();
-}
-
-document.querySelectorAll('.device').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.device').forEach(el=>el.classList.remove('active'));btn.classList.add('active');currentDevice=btn.innerText});
-document.querySelectorAll('.ratio').forEach(card=>card.onclick=(e)=>{
-  if (e.target.id === 'customRatioInput') return; // let input receive clicks
-  document.querySelectorAll('.ratio').forEach(el=>el.classList.remove('active'));
-  card.classList.add('active');
-  
-  const customLabel = document.getElementById('customRatioLabel');
-  const customInput = document.getElementById('customRatioInput');
-  
-  if(card.id==='customRatioCard'){
-    customLabel.style.display = 'none';
-    customInput.style.display = 'block';
-    customInput.focus();
-    const val = parseFloat(customInput.value);
-    if(!isNaN(val) && val > 1) {
-      currentRatio = val;
+        container.appendChild(row);
+      });
     }
-  } else {
-    customLabel.style.display = 'block';
-    customInput.style.display = 'none';
-    currentRatio=Number(card.dataset.ratio);
-  }
-  renderPreview()
-});
 
-document.getElementById('customRatioInput').oninput=(e)=>{
-  const val = parseFloat(e.target.value);
-  if(!isNaN(val) && val > 1) {
-    currentRatio = val;
-    renderPreview();
-  }
-};
-document.getElementById('search').oninput=(e)=>{const value=e.target.value.toLowerCase();renderFonts(allFonts.filter(font=>font.family.toLowerCase().includes(value)))};
-document.getElementById('baseSize').oninput=renderPreview;
-document.getElementById('variants').oninput=renderPreview;
 
-document.getElementById('generate').onclick=()=>{
-  const baseSize=Number(document.getElementById('baseSize').value)||16;
-  const variantCount=Number(document.getElementById('variants').value)||8;
-  const createDesign=document.querySelector('.toggle input[type="checkbox"]').checked;
-  const selectedWeights=[...document.querySelectorAll('.weight.active')].map(el=>el.dataset.style);
-  parent.postMessage({pluginMessage:{
-    type:'generate-system',
-    fontFamily:currentFont,
-    selectedWeights,
-    baseSize,
-    variantCount,
-    ratio:currentRatio,
-    device:currentDevice,
-    createDesign,
-    rangeMappings
-  }},'*')
-}
+    const loadedFonts = new Set();
 
-window.onmessage=(event)=>{
- const msg=event.data.pluginMessage;
- if(msg.type==='fonts-data'){
- allFonts=msg.fonts;
- renderFonts(allFonts);
- renderPreview();
- }
-}
+    function loadGoogleFont(fontFamily) {
+      if (!fontFamily || loadedFonts.has(fontFamily)) return;
+      loadedFonts.add(fontFamily);
 
-parent.postMessage({pluginMessage:{type:'get-fonts'}},'*')
-</script>
+      const cleanFamily = fontFamily.replace(/['"]/g, '');
+
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(cleanFamily).replace(/%20/g, '+')}:wght@400;500;600;700&display=swap`;
+
+      document.head.appendChild(link);
+    }
+
+    const fontObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const family = entry.target.dataset.fontFamily;
+          loadGoogleFont(family);
+          fontObserver.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    function renderFonts(list) {
+      const root = document.getElementById('fontList');
+      root.innerHTML = '';
+      list.forEach((font, index) => {
+        const card = document.createElement('div');
+        card.className = 'font-card' + (index === 0 ? ' active' : '');
+        card.dataset.fontFamily = font.family;
+        const variants = [...new Set(font.styles)].join(' • ');
+        card.innerHTML = `<div class="font-name" style="font-family:'${font.family}',sans-serif;font-weight:600">${font.family}</div><div class="font-meta">${variants}</div>`;
+        card.onclick = () => {
+          document.querySelectorAll('.font-card').forEach(el => el.classList.remove('active'));
+          card.classList.add('active');
+          currentFont = font.family;
+          renderWeights(font.styles);
+        };
+        root.appendChild(card);
+        fontObserver.observe(card);
+        if (index === 0 && !currentFont) { currentFont = font.family; renderWeights(font.styles) }
+      })
+    }
+
+    function renderWeights(styles) {
+      const root = document.getElementById('weights');
+      root.innerHTML = '';
+      [...new Set(styles)].forEach(style => {
+        const label = weightLabels[style.replace(/\s/g, '')] || style;
+        const item = document.createElement('div');
+        item.className = 'weight active';
+        item.dataset.style = style; // Send exact Figma style string!
+        item.innerHTML = `<span>${label}</span><input checked type="checkbox">`;
+        item.onclick = () => { item.classList.toggle('active'); item.querySelector('input').checked = item.classList.contains('active') }
+        root.appendChild(item);
+      })
+    }
+
+    function renderPreview() {
+      const base = Number(document.getElementById('baseSize').value) || 16;
+      const count = Number(document.getElementById('variants').value) || 8;
+      const arr = []; let current = base;
+      for (let i = 0; i < count; i++) { arr.unshift(Math.round(current)); current *= currentRatio }
+
+      if (!userCustomized) {
+        rangeMappings = getSmartDefaultMappings(arr);
+        renderMappings();
+      }
+
+      const semanticNames = computeSemanticNames(arr, rangeMappings);
+
+      const root = document.getElementById('preview');
+      root.innerHTML = '';
+      arr.forEach((size, index) => {
+        loadGoogleFont(currentFont);
+        const semName = semanticNames[index] || `Size ${index + 1}`;
+        root.innerHTML += `<div class="preview-card"><small>${semName}</small><div style="font-size:${Math.min(size, 48)}px;font-family:'${currentFont}',sans-serif">Aa</div><div style="margin-top:10px;font-weight:700">${size}px</div></div>`
+      })
+    }
+
+    function adjust(id, val) {
+      const el = document.getElementById(id);
+      el.value = Math.max(1, Number(el.value) + val);
+      renderPreview();
+    }
+
+    document.querySelectorAll('.device').forEach(btn => btn.onclick = () => { document.querySelectorAll('.device').forEach(el => el.classList.remove('active')); btn.classList.add('active'); currentDevice = btn.innerText });
+    document.querySelectorAll('.ratio').forEach(card => card.onclick = (e) => {
+      if (e.target.id === 'customRatioInput') return; // let input receive clicks
+      document.querySelectorAll('.ratio').forEach(el => el.classList.remove('active'));
+      card.classList.add('active');
+
+      const customLabel = document.getElementById('customRatioLabel');
+      const customInput = document.getElementById('customRatioInput');
+
+      if (card.id === 'customRatioCard') {
+        customLabel.style.display = 'none';
+        customInput.style.display = 'block';
+        customInput.focus();
+        const val = parseFloat(customInput.value);
+        if (!isNaN(val) && val > 1) {
+          currentRatio = val;
+        }
+      } else {
+        customLabel.style.display = 'block';
+        customInput.style.display = 'none';
+        currentRatio = Number(card.dataset.ratio);
+      }
+      renderPreview()
+    });
+
+    document.getElementById('customRatioInput').oninput = (e) => {
+      const val = parseFloat(e.target.value);
+      if (!isNaN(val) && val > 1) {
+        currentRatio = val;
+        renderPreview();
+      }
+    };
+    document.getElementById('search').oninput = (e) => { const value = e.target.value.toLowerCase(); renderFonts(allFonts.filter(font => font.family.toLowerCase().includes(value))) };
+    document.getElementById('baseSize').oninput = renderPreview;
+    document.getElementById('variants').oninput = renderPreview;
+
+    document.getElementById('generate').onclick = () => {
+      const baseSize = Number(document.getElementById('baseSize').value) || 16;
+      const variantCount = Number(document.getElementById('variants').value) || 8;
+      const createDesign = document.querySelector('.toggle input[type="checkbox"]').checked;
+      const selectedWeights = [...document.querySelectorAll('.weight.active')].map(el => el.dataset.style);
+      parent.postMessage({
+        pluginMessage: {
+          type: 'generate-system',
+          fontFamily: currentFont,
+          selectedWeights,
+          baseSize,
+          variantCount,
+          ratio: currentRatio,
+          device: currentDevice,
+          createDesign,
+          rangeMappings
+        }
+      }, '*')
+    }
+
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (msg.type === 'fonts-data') {
+        allFonts = msg.fonts;
+        renderFonts(allFonts);
+        renderPreview();
+      }
+    }
+
+    parent.postMessage({ pluginMessage: { type: 'get-fonts' } }, '*')
+
+      // Draggable Resizer Handler Logic
+      (function () {
+        const handle = document.createElement('div');
+        handle.id = 'resize-handle';
+        document.body.appendChild(handle);
+
+        let isDragging = false;
+        let startX, startY, startWidth, startHeight;
+
+        handle.addEventListener('mousedown', function (e) {
+          isDragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startWidth = window.innerWidth;
+          startHeight = window.innerHeight;
+
+          document.body.style.userSelect = 'none';
+          document.body.style.webkitUserSelect = 'none';
+          document.body.classList.add('resizing');
+
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+          e.preventDefault();
+        });
+
+        function onMouseMove(e) {
+          if (!isDragging) return;
+          const deltaX = e.clientX - startX;
+          const deltaY = e.clientY - startY;
+
+          // Bounds check to avoid layout collapse or breaking: Min size 720x480, Max size 2000x1600
+          let newWidth = Math.max(720, Math.min(2000, startWidth + deltaX));
+          let newHeight = Math.max(480, Math.min(1600, startHeight + deltaY));
+
+          parent.postMessage({
+            pluginMessage: {
+              type: 'resize',
+              width: newWidth,
+              height: newHeight
+            }
+          }, '*');
+        }
+
+        function onMouseUp() {
+          isDragging = false;
+          document.body.style.userSelect = '';
+          document.body.style.webkitUserSelect = '';
+          document.body.classList.remove('resizing');
+
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        }
+      })();
+  </script>
 </body>
+
 </html>
